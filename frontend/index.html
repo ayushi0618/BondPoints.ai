@@ -1,0 +1,335 @@
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BondPoints</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background-color: #111; color:#fff; overflow-x:hidden; }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, #ff7eb9, #89f7fe);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .navbar a:hover { text-decoration: underline; }
+
+    /* Sections */
+    section { padding: 80px 20px; max-width: 1000px; margin: auto; border-radius:10px; background-color:white; margin-bottom:40px; box-shadow:0 0 10px rgba(0,0,0,0.1); color:#333; }
+    h1,h2 { color:#ff7eb9; margin-bottom:15px; text-align:center; }
+    p { margin-bottom:15px; line-height:1.6; }
+
+    /* Home / Hero */
+    #home {
+      text-align:center;
+      padding:150px 20px;
+      border-radius:0;
+      box-shadow:none;
+      background: url('https://share.google/images/xqRHkEHerSUUTvho8') no-repeat center center/cover;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    #home h1 { font-size: 48px; margin-bottom:20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.7); }
+    #home p { font-size: 20px; margin-bottom:15px; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); }
+    #home .btn {
+      padding:15px 30px;
+      font-size:18px;
+      margin:10px;
+      background: linear-gradient(90deg, #ff7eb9, #ff4da6);
+      color:white;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      font-weight:bold;
+      transition: 0.3s;
+      z-index: 2;
+      position: relative;
+    }
+    #home .btn:hover { opacity:0.9; transform: scale(1.05); }
+
+    /* Floating hearts */
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ff7eb9;
+      transform: rotate(-45deg);
+      top: 100%;
+      border-radius: 5px 5px 0 0;
+      animation: floatUp linear infinite;
+      z-index:1;
+    }
+    .heart:before, .heart:after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #ff7eb9;
+      border-radius: 50%;
+    }
+    .heart:before { top: -10px; left: 0; }
+    .heart:after { left: 10px; top: 0; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(-45deg) scale(1); opacity:1; }
+      100% { transform: translateY(-800px) rotate(-45deg) scale(0.5); opacity:0; }
+    }
+
+    /* Canvas for nodes & lines */
+    #bondCanvas {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    /* Login Form */
+    #login { max-width:400px; margin:40px auto; padding:20px; display:none; text-align:center; background: #222; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3);}
+    label { display:block; margin:10px 0 5px; text-align:left; color:#fff; }
+    input { width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px; background:#333; color:#fff; }
+    button.login-btn { width:100%; padding:10px; background: linear-gradient(90deg, #ff7eb9, #ff4da6); color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; }
+    button.login-btn:hover { opacity:0.9; }
+
+    /* Testimonial */
+    .testimonial { margin-bottom:20px; }
+    .testimonial p { font-style:italic; }
+    .testimonial .author { text-align:right; font-weight:bold; color:#ff7eb9; }
+
+    /* About Features */
+    .features { display:flex; flex-wrap:wrap; justify-content:space-around; margin-top:20px; }
+    .feature { flex:1 1 250px; margin:15px; padding:15px; border:1px solid #ffc0e0; border-radius:10px; box-shadow:0 0 5px rgba(0,0,0,0.05); background:#fff0f6;}
+    .feature h3 { color:#ff7eb9; margin-bottom:10px; text-align:center; }
+    .feature p { text-align:center; }
+
+    /* CTA in About */
+    .about-cta { text-align:center; margin-top:20px; }
+    .about-cta button { padding:12px 25px; font-size:16px; background: linear-gradient(90deg, #ff7eb9, #ff4da6); color:white; border:none; border-radius:5px; cursor:pointer; }
+    .about-cta button:hover { opacity:0.9; }
+
+    @media(max-width:768px) {
+      .features { flex-direction:column; align-items:center; }
+      #home h1 { font-size:36px; }
+      #home p { font-size:18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="logo" style="font-weight:bold; font-size:20px; color:white;">BondPoints</div>
+    <div class="nav-links">
+      <a href="#home" onclick="hideLogin()">Home</a>
+      <a href="#testimonial" onclick="hideLogin()">Testimonial</a>
+      <a href="#about" onclick="hideLogin()">About</a>
+      <a onclick="showLogin()">Login</a>
+    </div>
+  </div>
+
+  <!-- Home / Hero Section -->
+  <section id="home">
+    <canvas id="bondCanvas"></canvas>
+    <h1>Welcome to BondPoints</h1>
+    <p>Track your loyalty rewards effortlessly and make every point count!</p>
+    <p>Connect all your loyalty programs in one place and watch your points grow.</p>
+    <p>Save time, redeem faster, and never miss an opportunity again.</p>
+    <button class="btn" onclick="showLogin()">Login</button>
+    <button class="btn" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">Learn More</button>
+  </section>
+
+  <!-- Login Form -->
+  <div id="login">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" required>
+      <button type="submit" class="login-btn">Login</button>
+    </form>
+    <p>Don’t have an account? <a href="./bond-setup.html">Create Bond</a></p>
+  </div>
+
+  <!-- Testimonial Section -->
+  <section id="testimonial">
+    <h2>Testimonials</h2>
+    <div class="testimonial">
+      <p>"BondPoints made tracking my rewards so simple. I never miss a point!"</p>
+      <div class="author">— Sarah J.</div>
+    </div>
+    <div class="testimonial">
+      <p>"All my loyalty programs in one place! It's convenient and efficient."</p>
+      <div class="author">— Michael R.</div>
+    </div>
+    <div class="testimonial">
+      <p>"I love the clean interface and helpful insights about my rewards."</p>
+      <div class="author">— Emma K.</div>
+    </div>
+    <div class="testimonial">
+      <p>"The platform is fast, reliable, and easy to use. Highly recommend!"</p>
+      <div class="author">— John P.</div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about">
+    <h2>About BondPoints</h2>
+    <p>BondPoints is your ultimate rewards management platform. We help you track, redeem, and maximize loyalty points across all programs in one place.</p>
+    <p>Our mission is to make rewards effortless and enjoyable. With real-time updates, personalized tips, and secure storage, you’ll never miss a point again.</p>
+    
+    <div class="features">
+      <div class="feature">
+        <h3>Track Rewards</h3>
+        <p>See all your points and rewards in one convenient dashboard.</p>
+      </div>
+      <div class="feature">
+        <h3>Redeem Easily</h3>
+        <p>Quickly redeem your points for the rewards you love.</p>
+      </div>
+      <div class="feature">
+        <h3>Stay Notified</h3>
+        <p>Get reminders for expiring points and special offers.</p>
+      </div>
+    </div>
+
+    <div class="about-cta">
+      <p>Ready to take control of your loyalty rewards?</p>
+      <button onclick="showLogin()">Login Now</button>
+    </div>
+  </section>
+
+  <script>
+    // Login form functions
+    function showLogin() {
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('login').scrollIntoView({behavior:'smooth'});
+    }
+    function hideLogin() {
+      document.getElementById('login').style.display = 'none';
+    }
+    document.getElementById('loginForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      alert('Login submitted!');
+    });
+
+    // Floating hearts
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.animationDuration = (5 + Math.random() * 5) + 's';
+      document.getElementById('home').appendChild(heart);
+      setTimeout(() => heart.remove(), 10000);
+    }
+    setInterval(createHeart, 300);
+
+    // Magical bond nodes
+    const canvas = document.getElementById('bondCanvas');
+    const ctx = canvas.getContext('2d');
+    let nodes = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createNodes(count = 50) {
+      nodes = [];
+      for (let i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          radius: 2 + Math.random() * 3
+        });
+      }
+    }
+
+    function drawNodes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw nodes
+      for (let node of nodes) {
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff7eb9';
+        ctx.fill();
+      }
+
+      // Draw connecting lines
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `rgba(255,126,185,${1 - dist/150})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function updateNodes() {
+      for (let node of nodes) {
+        node.x += node.vx;
+        node.y += node.vy;
+
+        // Bounce off walls
+        if(node.x < 0 || node.x > canvas.width) node.vx *= -1;
+        if(node.y < 0 || node.y > canvas.height) node.vy *= -1;
+
+        // Optional: interact with hearts
+        document.querySelectorAll('.heart').forEach(heart => {
+          const hx = parseFloat(heart.style.left || 0);
+          const hy = window.innerHeight - (parseFloat(heart.style.top) || 0);
+          const dx = node.x - hx;
+          const dy = node.y - hy;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 50) {
+            node.vx += dx*0.001;
+            node.vy += dy*0.001;
+          }
+        });
+      }
+    }
+
+    function animate() {
+      updateNodes();
+      drawNodes();
+      requestAnimationFrame(animate);
+    }
+
+    createNodes(60);
+    animate();
+  </script>
+
+</body>
+</html>
