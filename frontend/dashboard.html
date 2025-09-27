@@ -1,86 +1,779 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bond Dashboard</title>
-  <link rel="stylesheet" href="css\style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bond Dashboard — BondPoints</title>
+<style>
+  :root{
+    --bg:#0f0f12; --card:rgba(255,255,255,0.04);
+    --accent1:#ff7eb9; --accent2:#ff4da6; --accent3:#89f7fe;
+    --glass: rgba(255,255,255,0.06);
+    --text:#eee;
+  }
+  /* theme: .theme-neon, .theme-minimal */
+  .theme-neon { --accent1:#7CFFB2; --accent2:#7AD1FF; --accent3:#FF7BE9; --bg:#07070a; }
+  .theme-minimal { --accent1:#6b7280; --accent2:#9ca3af; --accent3:#d1d5db; --bg:#fafafa; --text:#111; --card:rgba(0,0,0,0.04); --glass: rgba(0,0,0,0.03); }
+  *{box-sizing:border-box; font-family: Inter, Arial, sans-serif}
+  html,body{height:100%; margin:0; background:linear-gradient(180deg,var(--bg), #0b0b0d); color:var(--text); -webkit-font-smoothing:antialiased}
+  .navbar{
+    position:sticky; top:0; z-index:999;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 18px; gap:12px;
+    background: linear-gradient(90deg,var(--accent1), var(--accent3));
+    box-shadow:0 6px 20px rgba(0,0,0,0.35);
+  }
+  .logo{font-weight:800; font-size:18px; color:#fff}
+  .nav-actions{display:flex; gap:10px; align-items:center}
+  .nav-actions button{background:transparent;border:0;color:#fff;font-weight:600;cursor:pointer;padding:8px 12px;border-radius:8px}
+  .nav-actions button:hover{opacity:.95; transform:translateY(-1px)}
+  .main { max-width:1200px; margin:26px auto; padding:0 18px; position:relative; z-index:2;}
+  /* hero */
+  #hero{
+    position:relative; overflow:hidden; border-radius:14px; padding:36px;
+    display:flex; flex-wrap:wrap; gap:24px; align-items:center; justify-content:space-between;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+  #hero .left { min-width:240px; flex:1; display:flex; flex-direction:column; gap:12px; align-items:flex-start}
+  #hero h1{margin:0; color:var(--accent1); font-size:28px}
+  #hero p{margin:0; color:var(--text); opacity:.95}
+  .hero-cta{display:flex; gap:10px; flex-wrap:wrap}
+  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2)); padding:10px 16px; border-radius:10px; color:#fff; border:0; cursor:pointer; font-weight:700}
+  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+  /* top-circles */
+  .circles { display:flex; gap:20px; align-items:center; }
+  .circle-card{width:150px; height:150px; border-radius:100%; display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 6px solid rgba(255,255,255,0.03)}
+  .circle-card .value{font-size:26px; font-weight:800; color:var(--accent1)}
+  .circle-card .label{position:absolute; bottom:-18px; font-size:13px; color:var(--text)}
+  /* heart gauge (svg inside) */
+  .gauge { width:120px; height:120px; display:block }
+  /* right side small panels */
+  .hero-right { display:flex; gap:12px; align-items:center; }
+  .small-card{background:var(--card); padding:12px; border-radius:10px; min-width:180px}
+  .small-card h3{margin:0; font-size:14px; color:var(--accent1)}
+  .small-card p{margin:6px 0 0; color:var(--text); font-size:13px}
+  /* layout */
+  .grid{display:grid; grid-template-columns:1fr 380px; gap:20px; margin-top:20px}
+  @media(max-width:980px){ .grid{grid-template-columns:1fr} .hero-right{display:none} .little-hide{display:none} }
+  /* cards */
+  .card{background:var(--card); padding:18px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.45)}
+  .card h2{margin:0 0 12px; color:var(--accent1)}
+  /* rewards list */
+  .rewards-list{display:flex; flex-direction:column; gap:12px}
+  .reward-item{display:grid; grid-template-columns:1fr 160px 80px; gap:10px; align-items:center; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))}
+  .reward-title{font-weight:700}
+  .progress-bar{height:12px; width:100%; background:rgba(255,255,255,0.03); border-radius:8px; overflow:hidden}
+  .progress-fill{height:100%; background:linear-gradient(90deg,var(--accent1),var(--accent2)); width:0}
+  .claim-btn{padding:8px 10px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--text); cursor:pointer}
+  .reward-meta{font-size:13px; color:var(--text); opacity:.9}
+  /* transaction history as timeline */
+  .timeline{display:flex; flex-direction:column; gap:10px}
+  .timeline-entry{display:flex; gap:12px; align-items:flex-start; padding:10px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))}
+  .entry-icon{width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px}
+  .entry-text{font-size:14px}
+  /* AI box improved */
+  .ai-hint{font-size:13px; color:#cfcfcf; margin-bottom:10px}
+  .ai-form label{display:block; font-size:13px; margin-bottom:6px}
+  .ai-form textarea{min-height:78px; resize:vertical}
+  .ai-response{margin-top:10px; font-style:italic; color:#cfcfcf}
+  /* mood chart */
+  canvas.mood-chart{width:100%; height:140px; display:block}
+  /* badges */
+  .badges{display:flex; gap:10px; flex-wrap:wrap}
+  .badge{padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); font-weight:700; font-size:13px}
+  /* shared goals */
+  .goal{padding:10px; border-radius:10px; display:flex; gap:10px; align-items:center; justify-content:space-between}
+  .goal .goal-meta{flex:1}
+  .goal .goal-actions{display:flex; gap:8px}
+  /* confetti placeholder */
+  .confetti { position:fixed; inset:0; pointer-events:none; z-index:9999 }
+  /* theme chooser */
+  .theme-select{display:flex; gap:8px; align-items:center}
+  .theme-btn{padding:6px 8px;border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.06); background:transparent; color:var(--text)}
+  /* footer small */
+  .small{font-size:12px; color:#bdbdbd}
+</style>
 </head>
-<body>
-  <div class="container">
-    <header>
+<body class="">
+
+<!-- Navbar -->
+<div class="navbar">
+  <div class="logo">BondPoints</div>
+  <div class="nav-actions">
+    <div class="theme-select little-hide">
+      <button class="theme-btn" data-theme="default">Romantic</button>
+      <button class="theme-btn" data-theme="neon">Neon</button>
+      <button class="theme-btn" data-theme="minimal">Minimal</button>
+    </div>
+    <button class="btn secondary" id="btn-history">History</button>
+    <button class="btn" id="btn-logout">Logout</button>
+  </div>
+</div>
+
+<!-- Animated background canvas and hearts -->
+<canvas id="bgCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+
+<div class="main" role="main">
+
+  <!-- HERO -->
+  <section id="hero" aria-label="dashboard hero">
+    <div class="left">
       <h1>Bond Dashboard</h1>
-      <button id="logout-btn" class="btn-secondary">Logout</button>
-    </header>
+      <p>Track points, settle incidents, unlock rewards & celebrate progress together. Use the AI box below to record events — it will suggest points to add or deduct, update both dashboards and log a transaction.</p>
 
-    <!-- Bond Info -->
-    <section id="bondInfo" class="box"></section>
+      <div class="hero-cta">
+        <button class="btn" id="btn-add-reward">Add Reward</button>
+        <button class="btn secondary" id="btn-goals">Shared Goals</button>
+        <button class="btn secondary" id="btn-moods">Mood Tracker</button>
+      </div>
+    </div>
 
-    <!-- Points Display -->
-    <section class="points box">
-      <h2>Points</h2>
-      <p><strong>You:</strong> <span id="userPoints">100</span></p>
-      <p><strong>Partner:</strong> <span id="partnerPoints">100</span></p>
-    </section>
+    <div class="circles">
+      <!-- user circle with heart gauge -->
+      <div class="circle-card card-center" id="userCard">
+        <svg class="gauge" viewBox="0 0 120 120">
+          <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="var(--accent1)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
+          <circle cx="60" cy="60" r="40" fill="transparent" stroke="rgba(255,255,255,0.03)" stroke-width="14"/>
+          <circle id="userArc" cx="60" cy="60" r="40" fill="transparent" stroke="url(#g1)" stroke-width="14" stroke-linecap="round"
+                 stroke-dasharray="0 251.2" transform="rotate(-90 60 60)"/>
+          <text x="60" y="66" text-anchor="middle" fill="var(--text)" font-size="18" font-weight="800" id="userPtsText">100</text>
+        </svg>
+        <div class="label">You</div>
+      </div>
 
-    <!-- Bond Level / Progress -->
-    <section class="box">
-      <h2>Bond Level</h2>
-      <div class="progress-container">
-        <p>You:</p>
-        <div class="progress-bar">
-          <div id="userProgress" class="progress-fill"></div>
-        </div>
-        <p>Partner:</p>
-        <div class="progress-bar">
-          <div id="partnerProgress" class="progress-fill"></div>
+      <div class="circle-card card-center" id="partnerCard">
+        <svg class="gauge" viewBox="0 0 120 120">
+          <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="var(--accent3)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
+          <circle cx="60" cy="60" r="40" fill="transparent" stroke="rgba(255,255,255,0.03)" stroke-width="14"/>
+          <circle id="partnerArc" cx="60" cy="60" r="40" fill="transparent" stroke="url(#g2)" stroke-width="14" stroke-linecap="round"
+                 stroke-dasharray="0 251.2" transform="rotate(-90 60 60)"/>
+          <text x="60" y="66" text-anchor="middle" fill="var(--text)" font-size="18" font-weight="800" id="partnerPtsText">100</text>
+        </svg>
+        <div class="label">Partner</div>
+      </div>
+    </div>
+
+    <div class="hero-right little-hide">
+      <div class="small-card small card">
+        <h3>Streak</h3>
+        <p id="streakText">0 days positive streak</p>
+      </div>
+      <div class="small-card small card" style="margin-left:6px">
+        <h3>Badges</h3>
+        <div class="badges" id="badgesArea">
+          <!-- badges appear here -->
         </div>
       </div>
-      <p>Level: <span id="bondLevel">1</span></p>
-    </section>
+    </div>
+  </section>
 
-    <!-- Interaction Form -->
-    <section class="box">
-      <h2>Interaction</h2>
-      <form id="interactionForm">
-        <label for="incident">What happened?</label>
-        <input type="text" id="incident" placeholder="Describe incident..." required>
+  <!-- GRID: left main + right sidebar -->
+  <div class="grid">
 
-        <label for="person">Who was responsible?</label>
-        <select id="person" required>
-          <option value="you">You</option>
-          <option value="partner">Partner</option>
-        </select>
+    <!-- LEFT: main column -->
+    <div>
 
-        <label for="damage">Type of Damage</label>
-        <select id="damage" required>
-          <option value="emotional">Emotional</option>
-          <option value="mental">Mental</option>
-          <option value="trust">Trust</option>
-          <option value="time">Time</option>
-        </select>
+      <!-- AI Suggestion / Interaction Box -->
+      <div class="card" id="aiBox" style="margin-bottom:18px">
+        <h2>AI Interaction — Record incident or positive note</h2>
+        <p class="ai-hint">Write what happened (brief). The AI will suggest how many points to add or deduct, explain why, and automatically update points & transaction history. Choose who was responsible and the impact type.</p>
+        <form id="aiForm" class="ai-form">
+          <label for="incidentInput">What happened?</label>
+          <textarea id="incidentInput" placeholder="e.g., 'I surprised them with breakfast' or 'I forgot an important call and delayed them'"></textarea>
 
-        <button type="submit">Apply Changes</button>
-      </form>
-    </section>
+          <label for="positiveToggle">Tone</label>
+          <select id="tone">
+            <option value="auto">Auto-detect (recommended)</option>
+            <option value="positive">Positive / Good</option>
+            <option value="negative">Negative / Bad</option>
+          </select>
 
-    <!-- Transaction History -->
-    <section class="box">
-      <h2>Transaction History</h2>
-      <div id="history">
-        <p>No history yet.</p>
+          <label for="personSelect">Who was responsible?</label>
+          <select id="personSelect"><option value="you">You</option><option value="partner">Partner</option></select>
+
+          <label for="impactSelect">Type of Impact</label>
+          <select id="impactSelect">
+            <option value="emotional">Emotional</option>
+            <option value="mental">Mental</option>
+            <option value="trust">Trust</option>
+            <option value="time">Time</option>
+          </select>
+
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn" id="aiSuggestBtn">Suggest & Apply</button>
+            <button type="button" class="btn secondary" id="aiPreviewBtn">Preview Suggestion</button>
+            <button type="button" class="btn secondary" id="aiClearBtn">Clear</button>
+          </div>
+        </form>
+        <div class="ai-response" id="aiSuggestionArea">No suggestion yet.</div>
       </div>
-    </section>
 
-    <!-- Rewards Section -->
-    <section class="box">
-      <h2>Rewards</h2>
-      <div class="list-item">☕ Coffee Date — 200 pts</div>
-      <div class="list-item">🍿 Movie Night — 500 pts</div>
-      <div class="list-item">🌹 Romantic Dinner — 1000 pts</div>
-    </section>
+      <!-- Rewards -->
+      <div class="card" id="rewardsCard" style="margin-bottom:18px">
+        <h2>Rewards — compete & redeem</h2>
+        <div class="rewards-list" id="rewardsList">
+          <!-- items injected by JS -->
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px">
+          <button class="btn" id="addRewardBtnSmall">Add Custom Reward</button>
+          <button class="btn secondary" id="bulkReset">Reset Demo Data</button>
+        </div>
+      </div>
+
+      <!-- Shared Goals -->
+      <div class="card" id="goalsCard" style="margin-bottom:18px">
+        <h2>Shared Goals</h2>
+        <div id="goalsList"></div>
+        <div style="margin-top:10px">
+          <button class="btn" id="createGoalBtn">Create Goal</button>
+        </div>
+      </div>
+
+      <!-- Mood tracker -->
+      <div class="card" id="moodCard" style="margin-bottom:18px">
+        <h2>Mood Tracker — weekly</h2>
+        <p style="color:#cfcfcf; margin:0 0 8px">Log moods and see a weekly trend. Positive entries increase chances of streaks & small bonus points.</p>
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px">
+          <select id="moodPerson"><option value="you">You</option><option value="partner">Partner</option></select>
+          <select id="moodValue"><option value="5">😊 Very Good</option><option value="4">🙂 Good</option><option value="3">😐 Okay</option><option value="2">😟 Low</option><option value="1">😢 Bad</option></select>
+          <button class="btn secondary" id="logMoodBtn">Log Mood</button>
+        </div>
+        <canvas id="moodChart" class="mood-chart"></canvas>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: sidebar -->
+    <aside>
+      <div class="card" style="margin-bottom:18px">
+        <h2>Transaction History</h2>
+        <div class="timeline" id="timelineArea">
+          <p class="small">No transactions yet.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px">
+        <h2>Achievements</h2>
+        <div id="achieveArea" class="badges"> </div>
+      </div>
+
+      <div class="card">
+        <h2>Tips</h2>
+        <p class="small">Use the AI box to add both positive and negative events. Positive events help your streak & unlock bonuses. Negative events deduct points; AI will offer reflection tips to recover.</p>
+      </div>
+    </aside>
+
   </div>
 
-  <script src="js\app.js"></script>
+  <!-- confetti container -->
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <footer style="text-align:center; margin-top:24px" class="small">BondPoints demo • All data local to browser</footer>
+</div>
+
+<script>
+/* ---------------------
+  Utilities & storage
+   --------------------- */
+const storage = {
+  get(k, def){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : def } catch(e){return def} },
+  set(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+}
+
+/* default state */
+const state = storage.get('bp_state', {
+  userPoints: 100,
+  partnerPoints: 100,
+  rewards: [
+    {id: 'r_coffee', name:'☕ Coffee Date', pts:200},
+    {id: 'r_movie', name:'🍿 Movie Night', pts:500},
+    {id: 'r_dinner', name:'🌹 Romantic Dinner', pts:1000}
+  ],
+  timeline: [],
+  badges: [],
+  streak:{count:0,lastPositive:null},
+  goals: [],
+  moods: { you:[], partner:[] } // array of {date, val}
+});
+
+/* save helper */
+function saveState(){ storage.set('bp_state', state) }
+
+/* small helpers */
+const qs = s => document.querySelector(s);
+const qsa = s => Array.from(document.querySelectorAll(s));
+function formatDate(d = new Date()){ return new Date(d).toLocaleString(); }
+function pushHistory(text, icon='🔔'){
+  state.timeline.unshift({ts:Date.now(), text, icon});
+  if(state.timeline.length>200) state.timeline.pop();
+  renderTimeline();
+  saveState();
+}
+
+/* ---------------------
+  Animated background (particles + hearts) 
+   --------------------- */
+const bgCanvas = qs('#bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let w=innerWidth, h=innerHeight;
+function resizeBg(){ w=bgCanvas.width=innerWidth; h=bgCanvas.height=innerHeight }
+addEventListener('resize', resizeBg); resizeBg();
+
+let particles=[];
+function createParticles(n=60){
+  particles = [];
+  for(let i=0;i<n;i++){
+    particles.push({
+      x: Math.random()*w, y: Math.random()*h,
+      vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4,
+      r: 1 + Math.random()*2
+    })
+  }
+}
+createParticles(70);
+
+function drawBg(){
+  bgCtx.clearRect(0,0,w,h);
+  // lines
+  for(let i=0;i<particles.length;i++){
+    const a=particles[i];
+    for(let j=i+1;j<particles.length;j++){
+      const b=particles[j];
+      const dx=a.x-b.x, dy=a.y-b.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<160){
+        bgCtx.strokeStyle = 'rgba(255,126,185,'+ (1-dist/160)*0.07 +')';
+        bgCtx.beginPath(); bgCtx.moveTo(a.x,a.y); bgCtx.lineTo(b.x,b.y); bgCtx.stroke();
+      }
+    }
+  }
+  // dots
+  for(const p of particles){
+    bgCtx.beginPath(); bgCtx.fillStyle='rgba(255,126,185,0.9)'; bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill();
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>w) p.vx*=-1;
+    if(p.y<0||p.y>h) p.vy*=-1;
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* hearts floating */
+function spawnHeart(){
+  const el = document.createElement('div');
+  el.className = 'heart';
+  el.style.left = (Math.random()*100)+'vw';
+  el.style.top = '100%';
+  el.style.opacity = Math.random()*0.9+.1;
+  el.style.transform = 'rotate(-45deg)';
+  el.style.zIndex = 1;
+  document.body.appendChild(el);
+  el.animate([{transform:'translateY(0) rotate(-45deg)', opacity:1},{transform:'translateY(-100vh) rotate(-45deg)', opacity:0}], {duration:6000+Math.random()*4000, easing:'linear'});
+  setTimeout(()=> el.remove(), 11000);
+}
+setInterval(spawnHeart, 400);
+
+/* ---------------------
+  Rendering & UI
+   --------------------- */
+const userArc = qs('#userArc'), partnerArc = qs('#partnerArc');
+const userPtsText = qs('#userPtsText'), partnerPtsText = qs('#partnerPtsText');
+const rewardsListEl = qs('#rewardsList'), timelineEl = qs('#timelineArea'), badgesArea = qs('#badgesArea'), achieveArea = qs('#achieveArea'), streakText = qs('#streakText');
+const moodChart = qs('#moodChart').getContext('2d');
+
+function percentToDash(p){
+  // circumference = 2πr, r=40 => ~251.2
+  const c = 2*Math.PI*40;
+  return `${(p/100)*c} ${c}`;
+}
+function renderPoints(){
+  userPtsText.textContent = state.userPoints;
+  partnerPtsText.textContent = state.partnerPoints;
+  userArc.setAttribute('stroke-dasharray', percentToDash(Math.min(100, (state.userPoints/Math.max(1,getMaxGoalPoints()))*100)));
+  partnerArc.setAttribute('stroke-dasharray', percentToDash(Math.min(100, (state.partnerPoints/Math.max(1,getMaxGoalPoints()))*100)));
+}
+
+/* determine a good scale for the arcs using either max reward or explicit target */
+function getMaxGoalPoints(){
+  let maxPts = 1000;
+  state.rewards.forEach(r=>{ if(r.pts>maxPts) maxPts=r.pts });
+  state.goals.forEach(g=>{ if(g.target>maxPts) maxPts=g.target });
+  return maxPts;
+}
+
+/* render rewards */
+function renderRewards(){
+  rewardsListEl.innerHTML='';
+  state.rewards.forEach((r, idx)=>{
+    const div = document.createElement('div');
+    div.className='reward-item';
+    div.dataset.id = r.id || 'custom_'+idx;
+    div.innerHTML = `<div>
+        <div class="reward-title">${r.name}</div>
+        <div class="reward-meta">${r.pts} pts • Progress (your/partner)</div>
+      </div>
+      <div>
+        <div class="progress-bar"><div class="progress-fill" id="fill_${div.dataset.id}"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px; align-items:flex-end">
+        <button class="claim-btn" data-id="${div.dataset.id}">Claim</button>
+        <div style="font-size:12px; color:var(--text); opacity:.8">${r.pts} pts</div>
+      </div>`;
+    rewardsListEl.appendChild(div);
+
+    // fill update
+    const fill = qs('#fill_'+div.dataset.id);
+    function updateFill(){
+      const userFillPct = Math.min(100, Math.round(state.userPoints / r.pts * 100));
+      const partnerFillPct = Math.min(100, Math.round(state.partnerPoints / r.pts * 100));
+      // show combined highest for visual
+      fill.style.width = Math.max(userFillPct, partnerFillPct)+'%';
+    }
+    updateFill();
+
+    // claim button
+    div.querySelector('.claim-btn').addEventListener('click', ()=>{
+      // whoever has enough claims first, priority to user
+      if(state.userPoints >= r.pts){
+        state.userPoints -= r.pts;
+        pushHistory(`You claimed "${r.name}" (-${r.pts})`, '🎉');
+        maybeAwardBadge('Rewarder');
+      } else if(state.partnerPoints >= r.pts){
+        state.partnerPoints -= r.pts;
+        pushHistory(`Partner claimed "${r.name}" (-${r.pts})`, '🎉');
+      } else {
+        alert('Not enough points yet!');
+        return;
+      }
+      saveState(); renderAll();
+    });
+  });
+}
+
+/* render timeline */
+function renderTimeline(){
+  if(!state.timeline.length){ timelineEl.innerHTML = '<p class="small">No transactions yet.</p>'; return; }
+  timelineEl.innerHTML='';
+  state.timeline.forEach(item=>{
+    const e = document.createElement('div'); e.className='timeline-entry';
+    e.innerHTML = `<div class="entry-icon" style="background:linear-gradient(90deg,var(--accent1),var(--accent2))">${item.icon}</div>
+      <div class="entry-text"><strong>${item.text}</strong><div style="font-size:12px;color:#bfbfbf">${new Date(item.ts).toLocaleString()}</div></div>`;
+    timelineEl.appendChild(e);
+  })
+}
+
+/* badges */
+function maybeAwardBadge(key){
+  // simple badges: Rewarder (claimed a reward), StreakMaster (streak >=3), GoalSetter (create goal), Empath (positive adds >= 3)
+  if(key==='Rewarder' && !state.badges.includes('Rewarder')) state.badges.push('Rewarder');
+  if(key==='StreakMaster' && !state.badges.includes('StreakMaster')) state.badges.push('StreakMaster');
+  if(key==='GoalSetter' && !state.badges.includes('GoalSetter')) state.badges.push('GoalSetter');
+  if(key==='Empath' && !state.badges.includes('Empath')) state.badges.push('Empath');
+  renderBadges();
+  saveState();
+  confettiBurst();
+}
+function renderBadges(){
+  badgesArea.innerHTML=''; achieveArea.innerHTML='';
+  state.badges.forEach(b=>{
+    const el = document.createElement('div'); el.className='badge'; el.textContent = b;
+    badgesArea.appendChild(el);
+    const el2 = document.createElement('div'); el2.className='badge'; el2.textContent = b;
+    achieveArea.appendChild(el2);
+  });
+}
+
+/* confetti */
+function confettiBurst(){
+  const root = qs('#confetti');
+  // simple confetti squares
+  for(let i=0;i<30;i++){
+    const s = document.createElement('div');
+    s.style.position='absolute';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*30+'%';
+    s.style.width = s.style.height = (6+Math.random()*10)+'px';
+    s.style.background = ['#FF7EB9','#89F7FE','#FFD76B','#7CFFB2'][Math.floor(Math.random()*4)];
+    s.style.opacity = 0.95;
+    s.style.transform = `rotate(${Math.random()*360}deg)`;
+    s.style.borderRadius = (Math.random()>0.5? '2px':'50%');
+    root.appendChild(s);
+    const dur = 1500 + Math.random()*1200;
+    s.animate([{transform:`translateY(0)`, opacity:1},{transform:`translateY(${200+Math.random()*300}px) rotate(${Math.random()*720}deg)`, opacity:0}], {duration:dur, easing:'cubic-bezier(.2,.8,.2,1)'});
+    setTimeout(()=> s.remove(), dur+30);
+  }
+}
+
+/* render goals */
+function renderGoals(){
+  const wrap = qs('#goalsList'); wrap.innerHTML='';
+  if(!state.goals.length) wrap.innerHTML = '<p class="small">No shared goals yet.</p>';
+  state.goals.forEach((g,idx)=>{
+    const div = document.createElement('div'); div.className='goal';
+    const total = (g.contributeYou||0) + (g.contributePartner||0);
+    const pct = Math.min(100, Math.round(total / g.target * 100));
+    div.innerHTML = `<div class="goal-meta"><div style="font-weight:700">${g.name}</div><div class="small">${total}/${g.target} pts • ${pct}%</div>
+      <div style="width:100%; margin-top:6px; height:10px; background:rgba(255,255,255,0.03); border-radius:8px"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));border-radius:8px"></div></div></div>
+      <div class="goal-actions">
+        <button class="btn" data-goal="${idx}" data-act="you">+You</button>
+        <button class="btn secondary" data-goal="${idx}" data-act="partner">+Partner</button>
+      </div>`;
+    wrap.appendChild(div);
+
+    div.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const idx = +b.dataset.goal;
+        const who = b.dataset.act;
+        const amount = parseInt(prompt('Points to contribute:', '20'),10) || 0;
+        if(amount<=0) return;
+        if(who==='you' && state.userPoints < amount){ alert('Not enough points'); return; }
+        if(who==='partner' && state.partnerPoints < amount){ alert('Partner not enough points'); return; }
+        if(who==='you') { state.userPoints -= amount; state.goals[idx].contributeYou = (state.goals[idx].contributeYou||0) + amount; pushHistory(`You contributed ${amount} pts to goal "${state.goals[idx].name}"`, '🎯') }
+        else { state.partnerPoints -= amount; state.goals[idx].contributePartner = (state.goals[idx].contributePartner||0) + amount; pushHistory(`Partner contributed ${amount} pts to goal "${state.goals[idx].name}"`, '🎯') }
+        // check if goal reached
+        const g = state.goals[idx];
+        if((g.contributeYou||0) + (g.contributePartner||0) >= g.target){
+          pushHistory(`Goal "${g.name}" achieved!`, '🏆');
+          maybeAwardBadge('GoalSetter');
+        }
+        saveState(); renderAll();
+      });
+    })
+  });
+}
+
+/* render mood chart */
+function renderMoodChart(){
+  // simple weekly chart: last 7 days counts averaged per person
+  const days=7;
+  const now = new Date(); const labels=[];
+  for(let i=days-1;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i);
+    labels.push(d);
+  }
+  // aggregate avg per day per person
+  const getAvg = (arr, date) => {
+    const day = date.toDateString();
+    const list = arr.filter(x => new Date(x.ts).toDateString() === day);
+    if(!list.length) return null;
+    return Math.round(list.reduce((s,i)=>s+i.val,0)/list.length);
+  }
+  const yYou = labels.map(d => getAvg(state.moods.you, d) || 0);
+  const yPartner = labels.map(d => getAvg(state.moods.partner, d) || 0);
+  // draw simple bar chart
+  const c = qs('#moodChart'); const ctx = c.getContext('2d');
+  c.width = c.clientWidth; c.height = 160;
+  ctx.clearRect(0,0,c.width,c.height);
+  const pad=18; const wbar = (c.width - pad*2) / (labels.length*2.5);
+  labels.forEach((d,i)=>{
+    const x = pad + i* (wbar*2.2);
+    const yh = c.height - 30;
+    // you
+    const v1 = yYou[i]; const ph1 = v1/5*(yh-20);
+    ctx.fillStyle = 'rgba(255,126,185,0.9)'; ctx.fillRect(x, c.height-20-ph1, wbar, ph1);
+    // partner
+    const v2 = yPartner[i]; const ph2 = v2/5*(yh-20);
+    ctx.fillStyle = 'rgba(137,247,254,0.9)'; ctx.fillRect(x + wbar + 6, c.height-20-ph2, wbar, ph2);
+    // labels
+    ctx.fillStyle = '#cfcfcf'; ctx.font = '11px sans-serif';
+    ctx.fillText((d.getMonth()+1)+'/'+d.getDate(), x, c.height - 4);
+  });
+}
+
+/* render streak & badges */
+function renderStreak(){
+  streakText.textContent = `${state.streak.count} day(s) positive streak`;
+  if(state.streak.count>=3) maybeAwardBadge('StreakMaster');
+}
+
+/* full render */
+function renderAll(){
+  renderPoints();
+  renderRewards();
+  renderTimeline();
+  renderBadges();
+  renderGoals();
+  renderMoodChart();
+  renderStreak();
+}
+
+/* ---------------------
+  AI Suggestion Logic (smarter)
+   - can auto-detect positive words
+   - damage types influence deduction ranges
+   - positive events add points
+   - logs timeline & reflection tips
+   --------------------- */
+const positiveWords = ["helped","gift","support","surprise","good","positive","love","kind","care","thank","nice","thoughtful","assist"];
+function aiSuggest({text,tone='auto', target='you', impact='emotional'}){
+  const lower = text.toLowerCase();
+  let action = 'deduct';
+  // detect positivity or force
+  if(tone==='positive') action='add';
+  else if(tone==='negative') action='deduct';
+  else {
+    if(positiveWords.some(w => lower.includes(w))) action='add';
+    else action='deduct';
+  }
+
+  let change = 0;
+  if(action==='add'){
+    change = Math.floor(Math.random()*21)+10; // +10..30
+  } else {
+    switch(impact){
+      case 'emotional': change = Math.floor(Math.random()*11)+10; break; //10-20
+      case 'mental': change = Math.floor(Math.random()*11)+15; break; //15-25
+      case 'trust': change = Math.floor(Math.random()*16)+20; break; //20-35
+      case 'time': change = Math.floor(Math.random()*11)+5; break; //5-15
+      default: change = Math.floor(Math.random()*11)+8;
+    }
+  }
+
+  // create a reason text and reflection tip
+  const reason = action==='add' ? `Positive: +${change} pts for "${text}"` : `Negative: -${change} pts for "${text}" (${impact})`;
+  const reflection = action==='add'
+    ? `Nice! That was a thoughtful move. Consider celebrating with a small shared activity to boost bonding.`
+    : `AI tip: Acknowledge it, apologize, and plan a corrective gesture (small favor/date) to regain points.`;
+
+  // return suggestion
+  return {action, change, reason, reflection, who: target};
+}
+
+/* AI UI actions */
+qs('#aiSuggestBtn').addEventListener('click', ()=>{
+  const text = qs('#incidentInput').value.trim();
+  if(!text){ alert('Describe the incident.'); return; }
+  const tone = qs('#tone').value;
+  const person = qs('#personSelect').value;
+  const impact = qs('#impactSelect').value;
+  const suggestion = aiSuggest({text, tone, target:person, impact});
+  applyAISuggestion(suggestion);
+});
+
+qs('#aiPreviewBtn').addEventListener('click', ()=>{
+  const text = qs('#incidentInput').value.trim() || '';
+  const tone = qs('#tone').value;
+  const person = qs('#personSelect').value;
+  const impact = qs('#impactSelect').value;
+  const suggestion = aiSuggest({text, tone, target:person, impact});
+  qs('#aiSuggestionArea').textContent = `Preview: ${suggestion.reason} — ${suggestion.reflection}`;
+});
+
+qs('#aiClearBtn').addEventListener('click', ()=>{ qs('#incidentInput').value=''; qs('#aiSuggestionArea').textContent='No suggestion yet.'});
+
+/* apply suggestion to state */
+function applyAISuggestion(sugg){
+  if(sugg.who === 'you'){
+    if(sugg.action==='deduct'){ state.userPoints = Math.max(0, state.userPoints - sugg.change); pushHistory(`You lost ${sugg.change} pts: ${sugg.reason}`, '➖'); }
+    else { state.userPoints += sugg.change; pushHistory(`You gained ${sugg.change} pts: ${sugg.reason}`, '➕'); }
+  } else {
+    if(sugg.action==='deduct'){ state.partnerPoints = Math.max(0, state.partnerPoints - sugg.change); pushHistory(`Partner lost ${sugg.change} pts: ${sugg.reason}`, '➖'); }
+    else { state.partnerPoints += sugg.change; pushHistory(`Partner gained ${sugg.change} pts: ${sugg.reason}`, '➕'); }
+  }
+  // update streak logic: only positive increments streak for the person who gained points
+  if(sugg.action==='add'){
+    const now = new Date().toDateString();
+    if(sugg.who==='you'){
+      if(state.streak.lastPositive === now) { state.streak.count++ } else { state.streak.count = 1; state.streak.lastPositive = now }
+    } else {
+      if(state.streak.lastPositive === now) { state.streak.count++ } else { state.streak.count = 1; state.streak.lastPositive = now }
+    }
+    // award small empath badge if many positives
+    const positiveCount = state.timeline.filter(t=>t.text.includes('gained')).length;
+    if(positiveCount>=3) maybeAwardBadge('Empath');
+    pushHistory(`AI reflection: ${sugg.reflection}`, '💬');
+  } else {
+    // negative: reduce streak
+    state.streak.count = 0;
+  }
+
+  qs('#aiSuggestionArea').textContent = S(`Applied: ${sugg.reason} — ${sugg.reflection}`);
+  saveState(); renderAll();
+}
+
+/* ---------------------
+  Mood logging
+   --------------------- */
+qs('#logMoodBtn').addEventListener('click', ()=>{
+  const who = qs('#moodPerson').value;
+  const val = parseInt(qs('#moodValue').value,10);
+  state.moods[who].push({ts:Date.now(), val});
+  pushHistory(`${who === 'you' ? 'You' : 'Partner'} logged mood ${['','😢','😟','😐','🙂','😊'][val]}`, '🙂');
+  saveState(); renderAll();
+});
+
+/* ---------------------
+  Goals / create
+   --------------------- */
+qs('#createGoalBtn').addEventListener('click', ()=>{
+  const name = prompt('Goal name:','Weekend getaway');
+  if(!name) return;
+  const target = parseInt(prompt('Target points?','2000'),10);
+  if(!target || target <= 0) return;
+  state.goals.push({name, target, contributeYou:0, contributePartner:0});
+  pushHistory(`Goal "${name}" created with target ${target}`, '🎯');
+  maybeAwardBadge('GoalSetter');
+  saveState(); renderAll();
+});
+
+/* ---------------------
+  Add custom reward modal-ish
+   --------------------- */
+qs('#addRewardBtnSmall').addEventListener('click', addCustomRewardFlow);
+qs('#btn-add-reward').addEventListener('click', addCustomRewardFlow);
+function addCustomRewardFlow(){
+  const name = prompt('Reward name?','Custom Reward');
+  if(!name) return;
+  const pts = parseInt(prompt('Points required?','300'),10);
+  if(!pts || pts<=0) return;
+  const id = 'custom_'+Math.random().toString(36).slice(2,8);
+  state.rewards.push({id,name,pts});
+  pushHistory(`Custom reward "${name}" added (${pts} pts)`, '🏷️');
+  saveState(); renderAll();
+}
+
+/* Reset demo data */
+qs('#bulkReset').addEventListener('click', ()=>{
+  if(!confirm('Reset all demo data to defaults?')) return;
+  localStorage.removeItem('bp_state'); location.reload();
+});
+
+/* ---------------------
+  Theme handling
+   --------------------- */
+qsa('.theme-btn').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const t = b.dataset.theme;
+    document.body.classList.remove('theme-neon','theme-minimal');
+    if(t==='neon') document.body.classList.add('theme-neon');
+    if(t==='minimal') document.body.classList.add('theme-minimal');
+  })
+});
+
+/* ---------------------
+  small helper: template-safe text
+   --------------------- */
+function S(s){ return s.replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+/* ---------------------
+  Mood chart & initial render
+   --------------------- */
+renderAll();
+
+/* ---------------------
+  Timeline initial rendering & restore if any persisted
+   --------------------- */
+renderTimeline();
+
+/* helper: string truncation */
+function truncate(s,n=40){ return s.length>n? s.slice(0,n)+'...': s }
+
+/* convenience: render immediately state changes every second sync to localStorage */
+setInterval(()=> saveState(), 2000);
+
+</script>
 </body>
 </html>
+
+
