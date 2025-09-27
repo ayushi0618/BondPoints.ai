@@ -174,40 +174,63 @@
     <!-- LEFT: main column -->
     <div>
 
-      <!-- AI Suggestion / Interaction Box -->
-      <div class="card" id="aiBox" style="margin-bottom:18px">
-        <h2>AI Interaction — Record incident or positive note</h2>
-        <p class="ai-hint">Write what happened (brief). The AI will suggest how many points to add or deduct, explain why, and automatically update points & transaction history. Choose who was responsible and the impact type.</p>
-        <form id="aiForm" class="ai-form">
-          <label for="incidentInput">What happened?</label>
-          <textarea id="incidentInput" placeholder="e.g., 'I surprised them with breakfast' or 'I forgot an important call and delayed them'"></textarea>
+     <!-- AI Suggestion / Interaction Box -->
+<div class="card" id="aiBox" style="
+  margin-bottom:18px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06));
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 20px rgba(255,126,185,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  ">
+  <h2 style="color: var(--accent1);">AI Interaction — Record incident or positive note</h2>
+  <p class="ai-hint" style="font-size:13px; color:#cfcfcf; margin-bottom:10px;">
+    Write what happened (brief). The AI will suggest how many points to add or deduct, explain why, and automatically update points & transaction history. Choose who was responsible and the impact type.
+  </p>
+  <form id="aiForm" class="ai-form">
+    <label for="incidentInput" style="display:block; font-size:14px; font-weight:600; margin-bottom:6px; color:var(--accent1);">What happened?</label>
+    <textarea id="incidentInput" placeholder="e.g., 'I surprised them with breakfast' or 'I forgot an important call and delayed them'" 
+      style="width:100%; min-height:100px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); transition:border 0.2s ease, box-shadow 0.2s ease;"></textarea>
 
-          <label for="positiveToggle">Tone</label>
-          <select id="tone">
-            <option value="auto">Auto-detect (recommended)</option>
-            <option value="positive">Positive / Good</option>
-            <option value="negative">Negative / Bad</option>
-          </select>
+    <label for="positiveToggle" style="display:block; font-size:14px; font-weight:600; margin:8px 0 6px; color:var(--accent1);">Tone</label>
+    <select id="tone" style="width:100%; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); cursor:pointer; transition:border 0.2s ease, box-shadow 0.2s ease;">
+      <option value="auto">Auto-detect (recommended)</option>
+      <option value="positive">Positive / Good</option>
+      <option value="negative">Negative / Bad</option>
+    </select>
 
-          <label for="personSelect">Who was responsible?</label>
-          <select id="personSelect"><option value="you">You</option><option value="partner">Partner</option></select>
+    <label for="personSelect" style="display:block; font-size:14px; font-weight:600; margin:8px 0 6px; color:var(--accent1);">Who was responsible?</label>
+    <select id="personSelect" style="width:100%; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); cursor:pointer; transition:border 0.2s ease, box-shadow 0.2s ease;">
+      <option value="you">You</option>
+      <option value="partner">Partner</option>
+    </select>
 
-          <label for="impactSelect">Type of Impact</label>
-          <select id="impactSelect">
-            <option value="emotional">Emotional</option>
-            <option value="mental">Mental</option>
-            <option value="trust">Trust</option>
-            <option value="time">Time</option>
-          </select>
+    <label for="impactSelect" style="display:block; font-size:14px; font-weight:600; margin:8px 0 6px; color:var(--accent1);">Type of Impact</label>
+    <select id="impactSelect" style="width:100%; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); cursor:pointer; transition:border 0.2s ease, box-shadow 0.2s ease;">
+      <option value="emotional">Emotional</option>
+      <option value="mental">Mental</option>
+      <option value="trust">Trust</option>
+      <option value="time">Time</option>
+    </select>
 
-          <div style="display:flex;gap:8px">
-            <button type="button" class="btn" id="aiSuggestBtn">Suggest & Apply</button>
-            <button type="button" class="btn secondary" id="aiPreviewBtn">Preview Suggestion</button>
-            <button type="button" class="btn secondary" id="aiClearBtn">Clear</button>
-          </div>
-        </form>
-        <div class="ai-response" id="aiSuggestionArea">No suggestion yet.</div>
-      </div>
+    <div style="display:flex;gap:8px; margin-top:10px;">
+      <button type="button" class="btn" id="aiSuggestBtn" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">Suggest & Apply</button>
+      <button type="button" class="btn secondary" id="aiPreviewBtn" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">Preview Suggestion</button>
+      <button type="button" class="btn secondary" id="aiClearBtn" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">Clear</button>
+    </div>
+  </form>
+
+  <div class="ai-response" id="aiSuggestionArea" style="
+    margin-top:12px;
+    font-style:italic;
+    color:#fff;
+    padding:12px 14px;
+    border-radius:12px;
+    background: linear-gradient(135deg, rgba(255,126,185,0.1), rgba(137,247,254,0.1));
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;">No suggestion yet.</div>
+</div>
 
       <!-- Rewards -->
       <div class="card" id="rewardsCard" style="margin-bottom:18px">
@@ -775,5 +798,3 @@ setInterval(()=> saveState(), 2000);
 </script>
 </body>
 </html>
-
-
