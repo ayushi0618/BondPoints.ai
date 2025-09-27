@@ -268,25 +268,95 @@
     </div>
 
     <!-- RIGHT: sidebar -->
-    <aside>
-      <div class="card" style="margin-bottom:18px">
-        <h2>Transaction History</h2>
-        <div class="timeline" id="timelineArea">
-          <p class="small">No transactions yet.</p>
-        </div>
-      </div>
+    <!-- ...existing code... -->
+<aside>
+  <div class="card" style="margin-bottom:18px">
+    <h2>Transaction History</h2>
+    <div class="timeline" id="timelineArea">
+      <p class="small">No transactions yet.</p>
+    </div>
+  </div>
 
-      <div class="card" style="margin-bottom:18px">
-        <h2>Achievements</h2>
-        <div id="achieveArea" class="badges"> </div>
-      </div>
+  <!-- 🔥 Monthly Streak Section (place here) -->
+  <section class="streak-section">
+    <h3>Monthly Streak</h3>
+    <div id="streakGrid" class="streak-grid"></div>
+  </section>
 
-      <div class="card">
-        <h2>Tips</h2>
-        <p class="small">Use the AI box to add both positive and negative events. Positive events help your streak & unlock bonuses. Negative events deduct points; AI will offer reflection tips to recover.</p>
-      </div>
-    </aside>
+  <style>
+    .streak-section {
+      margin-top: 2rem;
+      text-align: center;
+    }
+    .streak-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr); /* 7 days per row */
+      gap: 6px;
+      justify-content: center;
+      margin: 1rem auto;
+      max-width: 200px;
+    }
+    .streak-day {
+      width: 24px;
+      height: 24px;
+      background-color: #eee;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+    .streak-day.active {
+      background-color: pink;
+    }
+  </style>
 
+  <script>
+    // Generate 30 streak boxes (organized in weeks)
+    const streakGrid = document.getElementById("streakGrid");
+    const totalDays = 30;
+
+    function initStreakGrid() {
+      for (let i = 1; i <= totalDays; i++) {
+        const box = document.createElement("div");
+        box.classList.add("streak-day");
+        box.dataset.day = i;
+        streakGrid.appendChild(box);
+      }
+    }
+
+    // Save streak progress in localStorage
+    function markDayComplete(day) {
+      localStorage.setItem(`streak-day-${day}`, "true");
+      updateStreakUI();
+    }
+
+    function updateStreakUI() {
+      document.querySelectorAll(".streak-day").forEach((box) => {
+        if (localStorage.getItem(`streak-day-${box.dataset.day}`) === "true") {
+          box.classList.add("active");
+        }
+      });
+    }
+
+    // Example: Mark today complete automatically (replace with goal completion hook)
+    const today = new Date().getDate(); // gets today's date (1–31)
+    if (today <= totalDays) {
+      markDayComplete(today);
+    }
+
+    // Init grid and update UI
+    initStreakGrid();
+    updateStreakUI();
+  </script>
+  <!-- ...rest of sidebar... -->
+  <div class="card" style="margin-bottom:18px">
+    <h2>Achievements</h2>
+    <div id="achieveArea" class="badges"> </div>
+  </div>
+  <div class="card">
+    <h2>Tips</h2>
+    <p class="small">Use the AI box to add both positive and negative events. Positive events help your streak & unlock bonuses. Negative events deduct points; AI will offer reflection tips to recover.</p>
+  </div>
+</aside>
+<!-- ...existing code... -->
   </div>
 
   <!-- confetti container -->
@@ -796,5 +866,6 @@ function truncate(s,n=40){ return s.length>n? s.slice(0,n)+'...': s }
 setInterval(()=> saveState(), 2000);
 
 </script>
+
 </body>
 </html>
