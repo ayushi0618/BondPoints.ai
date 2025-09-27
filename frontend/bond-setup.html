@@ -1,21 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Bond</title>
-  <link rel="stylesheet" href="/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Bond</title>
+<style>
+  /* Dark dashboard background */
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #0f0f0f;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  /* Heart animation */
+  .heart-bg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, #ff4f87, #ff6b9e);
+    transform: rotate(-45deg);
+    animation: floatHeart linear infinite;
+  }
+  .heart::before,
+  .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, #ff4f87, #ff6b9e);
+    border-radius: 50%;
+  }
+  .heart::before { top: -10px; left: 0; }
+  .heart::after { left: 10px; top: 0; }
+
+  @keyframes floatHeart {
+    0% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-100px) rotate(-45deg); opacity: 0; }
+  }
+
+  /* Container */
+  .container {
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    margin-top: 2rem;
+    z-index: 1;
+    position: relative;
+  }
+
+  h1.page-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #ff4f87;
+    font-size: 2rem;
+  }
+
+  /* Box (cards) */
+  .box {
+    background: rgba(20, 20, 20, 0.85);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(255,0,120,0.4);
+  }
+  .box h2 { margin-top:0; margin-bottom:1rem; color:#fff; }
+
+  /* Form layout */
+  form.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 12px;
+    align-items: center;
+  }
+  form label { color:#ccc; font-size:0.9rem; }
+  form input, form select {
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    font-size: 0.95rem;
+    transition: border 0.3s;
+  }
+  form input:focus, form select:focus { border-color: #ff4f87; outline: none; }
+
+  /* Button */
+  .form-actions {
+    grid-column: span 2;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #ff6b9e, #ff4f87);
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,107,158,0.4);
+  }
+  #bondSummary p, #bondSummary ul, #bondSummary li {
+  color: #ffb6c1; /* Light pink */
+}
+
+#bondInfo p, #bondInfo ul, #bondInfo li {
+  color: #ff69b4; /* Hot pink */
+}
+
+
+  /* Back link */
+  .back-link { text-align: center; margin-top:1rem; }
+  .back-link a { color: #ff4f87; text-decoration:none; font-weight:bold; }
+  .back-link a:hover { text-decoration: underline; color:#d93c6b; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Create Your Bond</h1>
+<div class="heart-bg" id="hearts"></div>
 
-    <form id="bondSetupForm">
-      <label for="userName">Your Name:</label>
-      <input type="text" id="userName" required>
+<div class="container">
+  <h1 class="page-title">Create Your Bond</h1>
 
-      <label for="partnerName">Partner's Name:</label>
-      <input type="text" id="partnerName" required>
+  <div class="box">
+    <h2>Bond Setup</h2>
+    <form id="bondSetupForm" class="form-grid">
+      <label for="userEmail">Your Email:</label>
+      <input type="email" id="userEmail" required>
+
+      <label for="partnerEmail">Partner's Email:</label>
+      <input type="email" id="partnerEmail" required>
+
+      <label for="bondName">Bond Name:</label>
+      <input type="text" id="bondName" required>
 
       <label for="bondType">Bond Type:</label>
       <select id="bondType" required>
@@ -24,11 +162,11 @@
         <option value="marriage">Marriage</option>
       </select>
 
-      <label for="bondDuration">Bond Duration (days):</label>
+      <label for="bondDuration">Duration (days):</label>
       <select id="bondDuration" required>
-        <option value="7">7 Days</option>
-        <option value="30">30 Days</option>
-        <option value="90">90 Days</option>
+        <option value="7">7</option>
+        <option value="30">30</option>
+        <option value="90">90</option>
       </select>
 
       <label for="bondStartDate">Start Date:</label>
@@ -37,15 +175,83 @@
       <label for="bondEndDate">End Date:</label>
       <input type="date" id="bondEndDate" required>
 
-      <button type="button" id="startBondBtn">Start Bond</button>
+      <div class="form-actions">
+        <button type="button" id="startBondBtn" class="btn-primary">Start Bond</button>
+      </div>
     </form>
-
-    <div id="bondSummary" class="box"></div>
-    <div id="bondInfo" class="box"></div>
-
-    <p><a href="/index.html">Back to Login</a></p>
   </div>
 
-  <script src="js\app.js"></script>
+  <div id="bondSummary" class="box">
+    <h2>Bond Summary</h2>
+    <p>No bond started yet.</p>
+  </div>
+
+  <div id="bondInfo" class="box">
+    <h2>Bond Info</h2>
+    <p>Details will appear here after bond setup.</p>
+  </div>
+
+  <p class="back-link"><a href="/index.html">← Back to home </a></p>
+</div>
+
+<script>
+  // Heart animation
+  const heartsContainer = document.getElementById('hearts');
+  for(let i=0; i<30; i++){
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.style.left = Math.random()*100 + 'vw';
+    heart.style.animationDuration = (5+Math.random()*5) + 's';
+    heart.style.width = heart.style.height = (10 + Math.random()*20) + 'px';
+    heartsContainer.appendChild(heart);
+  }
+
+  // Example registered users (from login)
+  const registeredUsers = JSON.parse(localStorage.getItem('users') || '[]');
+
+  document.getElementById("startBondBtn").addEventListener("click", function(){
+    const userEmail = document.getElementById("userEmail").value.trim();
+    const partnerEmail = document.getElementById("partnerEmail").value.trim();
+    const bondName = document.getElementById("bondName").value.trim();
+    const bondType = document.getElementById("bondType").value;
+    const bondDuration = document.getElementById("bondDuration").value;
+    const bondStartDate = document.getElementById("bondStartDate").value;
+    const bondEndDate = document.getElementById("bondEndDate").value;
+
+    // Check registration
+    const userRegistered = registeredUsers.includes(userEmail);
+    const partnerRegistered = registeredUsers.includes(partnerEmail);
+    if(!userRegistered || !partnerRegistered){
+      alert("Both emails must be registered users!");
+      return;
+    }
+
+    if(!bondName){
+      alert("Please enter bond name!");
+      return;
+    }
+
+    // Update Summary
+    document.getElementById("bondSummary").innerHTML = `
+      <h2>Bond Summary</h2>
+      <p><strong>${bondName}</strong> bond between <strong>${userEmail}</strong> and <strong>${partnerEmail}</strong>.</p>
+      <p>Type: ${bondType}</p>
+      <p>Duration: ${bondDuration} days</p>
+      <p>Start: ${bondStartDate}</p>
+      <p>End: ${bondEndDate}</p>
+    `;
+
+    document.getElementById("bondInfo").innerHTML = `
+      <h2>Bond Info</h2>
+      <ul>
+        <li>Bond Name: ${bondName}</li>
+        <li>Bond Type: ${bondType}</li>
+        <li>Duration: ${bondDuration} days</li>
+        <li>Start Date: ${bondStartDate}</li>
+        <li>End Date: ${bondEndDate}</li>
+      </ul>
+    `;
+  });
+</script>
 </body>
 </html>
