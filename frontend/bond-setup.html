@@ -191,7 +191,7 @@
     <p>Details will appear here after bond setup.</p>
   </div>
 
-  <p class="back-link"><a href="/index.html">← Back to home </a></p>
+  <p class="back-link"><a href="C:\Users\HP\OneDrive\Desktop\Bonds-main\frontend\index.html">← Back to home </a></p>
 </div>
 
 <script>
@@ -210,48 +210,51 @@
   const registeredUsers = JSON.parse(localStorage.getItem('users') || '[]');
 
   document.getElementById("startBondBtn").addEventListener("click", function(){
-    const userEmail = document.getElementById("userEmail").value.trim();
-    const partnerEmail = document.getElementById("partnerEmail").value.trim();
-    const bondName = document.getElementById("bondName").value.trim();
-    const bondType = document.getElementById("bondType").value;
-    const bondDuration = document.getElementById("bondDuration").value;
-    const bondStartDate = document.getElementById("bondStartDate").value;
-    const bondEndDate = document.getElementById("bondEndDate").value;
+  const userEmail = document.getElementById("userEmail").value.trim();
+  const partnerEmail = document.getElementById("partnerEmail").value.trim();
+  const bondName = document.getElementById("bondName").value.trim();
+  const bondType = document.getElementById("bondType").value;
+  const bondDuration = document.getElementById("bondDuration").value;
+  const bondStartDate = document.getElementById("bondStartDate").value;
+  const bondEndDate = document.getElementById("bondEndDate").value;
 
-    // Check registration
-    const userRegistered = registeredUsers.includes(userEmail);
-    const partnerRegistered = registeredUsers.includes(partnerEmail);
-    if(!userRegistered || !partnerRegistered){
-      alert("Both emails must be registered users!");
-      return;
-    }
+  // Check registration
+  const userRegistered = registeredUsers.includes(userEmail);
+  const partnerRegistered = registeredUsers.includes(partnerEmail);
+  if(!userRegistered || !partnerRegistered){
+    alert("Both emails must be registered users!");
+    return;
+  }
 
-    if(!bondName){
-      alert("Please enter bond name!");
-      return;
-    }
+  if(!bondName){
+    alert("Please enter bond name!");
+    return;
+  }
 
-    // Update Summary
-    document.getElementById("bondSummary").innerHTML = `
-      <h2>Bond Summary</h2>
-      <p><strong>${bondName}</strong> bond between <strong>${userEmail}</strong> and <strong>${partnerEmail}</strong>.</p>
-      <p>Type: ${bondType}</p>
-      <p>Duration: ${bondDuration} days</p>
-      <p>Start: ${bondStartDate}</p>
-      <p>End: ${bondEndDate}</p>
-    `;
+  // Update Summary
+  document.getElementById("bondSummary").innerHTML = `
+    <h2>Bond Summary</h2>
+    <p><strong>${bondName}</strong> bond between <strong>${userEmail}</strong> and <strong>${partnerEmail}</strong>.</p>
+    <p>Type: ${bondType}</p>
+    <p>Duration: ${bondDuration} days</p>
+    <p>Start: ${bondStartDate}</p>
+    <p>End: ${bondEndDate}</p>
+  `;
 
-    document.getElementById("bondInfo").innerHTML = `
-      <h2>Bond Info</h2>
-      <ul>
-        <li>Bond Name: ${bondName}</li>
-        <li>Bond Type: ${bondType}</li>
-        <li>Duration: ${bondDuration} days</li>
-        <li>Start Date: ${bondStartDate}</li>
-        <li>End Date: ${bondEndDate}</li>
-      </ul>
-    `;
-  });
+  document.getElementById("bondInfo").innerHTML = `
+    <h2>Bond Info</h2>
+    <ul>
+      <li>Bond Name: ${bondName}</li>
+      <li>Bond Type: ${bondType}</li>
+      <li>Duration: ${bondDuration} days</li>
+      <li>Start Date: ${bondStartDate}</li>
+      <li>End Date: ${bondEndDate}</li>
+    </ul>
+  `;
+
+  // Redirect to dashboard
+  window.location.href = "dashboard.html";
+});
 </script>
 </body>
 </html>

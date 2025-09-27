@@ -864,8 +864,16 @@ function truncate(s,n=40){ return s.length>n? s.slice(0,n)+'...': s }
 
 /* convenience: render immediately state changes every second sync to localStorage */
 setInterval(()=> saveState(), 2000);
-
 </script>
+<button onclick="logout()">Logout</button>
+<script>
+function logout() {
+  localStorage.removeItem('currentUser');
+  window.location.href = "index.html";
+}
+</script>
+
+
 
 </body>
 </html>

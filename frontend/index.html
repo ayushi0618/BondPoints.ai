@@ -167,7 +167,7 @@
       <input type="password" id="password" required>
       <button type="submit" class="login-btn">Login</button>
     </form>
-    <p>Don’t have an account? <a href="./bond-setup.html">Create Bond</a></p>
+    <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
   </div>
 
   <!-- Testimonial Section -->
@@ -219,117 +219,126 @@
   </section>
 
   <script>
-    // Login form functions
-    function showLogin() {
-      document.getElementById('login').style.display = 'block';
-      document.getElementById('login').scrollIntoView({behavior:'smooth'});
+  // Login form functions
+  function showLogin() {
+    document.getElementById('login').style.display = 'block';
+    document.getElementById('login').scrollIntoView({behavior:'smooth'});
+  }
+  function hideLogin() {
+    document.getElementById('login').style.display = 'none';
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email && u.password === password);
+    if(user){
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      window.location.href = "dashboard.html";
+    }else{
+      alert("Invalid email or password!");
     }
-    function hideLogin() {
-      document.getElementById('login').style.display = 'none';
+  });
+
+  // Floating hearts
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.animationDuration = (5 + Math.random() * 5) + 's';
+    document.getElementById('home').appendChild(heart);
+    setTimeout(() => heart.remove(), 10000);
+  }
+  setInterval(createHeart, 300);
+
+  // Magical bond nodes
+  const canvas = document.getElementById('bondCanvas');
+  const ctx = canvas.getContext('2d');
+  let nodes = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function createNodes(count = 50) {
+    nodes = [];
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        radius: 2 + Math.random() * 3
+      });
     }
-    document.getElementById('loginForm').addEventListener('submit', function(e){
-      e.preventDefault();
-      alert('Login submitted!');
-    });
+  }
 
-    // Floating hearts
-    function createHeart() {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = Math.random() * window.innerWidth + 'px';
-      heart.style.animationDuration = (5 + Math.random() * 5) + 's';
-      document.getElementById('home').appendChild(heart);
-      setTimeout(() => heart.remove(), 10000);
-    }
-    setInterval(createHeart, 300);
+  function drawNodes() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Magical bond nodes
-    const canvas = document.getElementById('bondCanvas');
-    const ctx = canvas.getContext('2d');
-    let nodes = [];
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    function createNodes(count = 50) {
-      nodes = [];
-      for (let i = 0; i < count; i++) {
-        nodes.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          radius: 2 + Math.random() * 3
-        });
-      }
+    // Draw nodes
+    for (let node of nodes) {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff7eb9';
+      ctx.fill();
     }
 
-    function drawNodes() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw nodes
-      for (let node of nodes) {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff7eb9';
-        ctx.fill();
-      }
-
-      // Draw connecting lines
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if(dist < 150) {
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(255,126,185,${1 - dist/150})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
+    // Draw connecting lines
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < 150) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(255,126,185,${1 - dist/150})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
         }
       }
     }
+  }
 
-    function updateNodes() {
-      for (let node of nodes) {
-        node.x += node.vx;
-        node.y += node.vy;
+  function updateNodes() {
+    for (let node of nodes) {
+      node.x += node.vx;
+      node.y += node.vy;
 
-        // Bounce off walls
-        if(node.x < 0 || node.x > canvas.width) node.vx *= -1;
-        if(node.y < 0 || node.y > canvas.height) node.vy *= -1;
+      // Bounce off walls
+      if(node.x < 0 || node.x > canvas.width) node.vx *= -1;
+      if(node.y < 0 || node.y > canvas.height) node.vy *= -1;
 
-        // Optional: interact with hearts
-        document.querySelectorAll('.heart').forEach(heart => {
-          const hx = parseFloat(heart.style.left || 0);
-          const hy = window.innerHeight - (parseFloat(heart.style.top) || 0);
-          const dx = node.x - hx;
-          const dy = node.y - hy;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if(dist < 50) {
-            node.vx += dx*0.001;
-            node.vy += dy*0.001;
-          }
-        });
-      }
+      // Optional: interact with hearts
+      document.querySelectorAll('.heart').forEach(heart => {
+        const hx = parseFloat(heart.style.left || 0);
+        const hy = window.innerHeight - (parseFloat(heart.style.top) || 0);
+        const dx = node.x - hx;
+        const dy = node.y - hy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < 50) {
+          node.vx += dx*0.001;
+          node.vy += dy*0.001;
+        }
+      });
     }
+  }
 
-    function animate() {
-      updateNodes();
-      drawNodes();
-      requestAnimationFrame(animate);
-    }
+  function animate() {
+    updateNodes();
+    drawNodes();
+    requestAnimationFrame(animate);
+  }
 
-    createNodes(60);
-    animate();
-  </script>
-
+  createNodes(60);
+  animate();
+</script>
 </body>
 </html>
