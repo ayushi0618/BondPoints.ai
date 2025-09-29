@@ -23,12 +23,7 @@ app.get("/", (req, res) => {
         available_routes: ["/api/auth", "/api/bonds"] 
     });
 });
-// ----------------------------------------------------------------
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-
-// ... existing code ...
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
 
