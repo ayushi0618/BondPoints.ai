@@ -1,4 +1,4 @@
-   <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -218,8 +218,8 @@
     </div>
   </section>
 
-  <script>
-  // Login form functions
+<script>
+  // Show/hide login form
   function showLogin() {
     document.getElementById('login').style.display = 'block';
     document.getElementById('login').scrollIntoView({behavior:'smooth'});
@@ -228,21 +228,51 @@
     document.getElementById('login').style.display = 'none';
   }
 
-  document.getElementById('loginForm').addEventListener('submit', function(e){
+  // =========================================================================
+  // CORRECTED LOGIN HANDLER: USES REDIRECT URL SENT BY THE BACKEND
+  // The backend (auth.js) now sends 'redirectUrl' based on isConfigured status.
+  // =========================================================================
+  document.getElementById('loginForm').addEventListener('submit', async function(e){
     e.preventDefault();
     const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    let users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => u.email === email && u.password === password);
-    if(user){
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      window.location.href = "dashboard.html";
-    }else{
-      alert("Invalid email or password!");
+    const password = document.getElementById('password').value.trim();
+    
+    // Ensure the correct base URL is used (adjust if needed)
+    const API_URL = "http://localhost:5000/api/auth/login";
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+  
+      const data = await res.json();
+  
+      if (res.ok) {
+        // 1. Store the JWT token
+        localStorage.setItem("token", data.token);
+  
+        // 2. CRITICAL FIX: Use the redirect URL determined by the backend (auth.js)
+        // This URL will be "dashboard.html" OR "bond-setup.html"
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        } else {
+          // Fallback, though 'auth.js' should always provide one
+          window.location.href = "dashboard.html"; 
+        }
+      } else {
+        // Login failed (Invalid credentials, etc.)
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error('Login Error:', error);
+      alert("A network error occurred. Please try again.");
     }
   });
+  // =========================================================================
 
-  // Floating hearts
+  // Floating hearts (kept your animation code)
   function createHeart() {
     const heart = document.createElement('div');
     heart.className = 'heart';
@@ -253,7 +283,7 @@
   }
   setInterval(createHeart, 300);
 
-  // Magical bond nodes
+  // Magical bond nodes (kept your animation code)
   const canvas = document.getElementById('bondCanvas');
   const ctx = canvas.getContext('2d');
   let nodes = [];
@@ -340,5 +370,6 @@
   createNodes(60);
   animate();
 </script>
+
 </body>
 </html>

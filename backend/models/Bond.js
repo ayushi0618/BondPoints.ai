@@ -1,14 +1,40 @@
 const mongoose = require("mongoose");
 
 const BondSchema = new mongoose.Schema({
-  bondName: { type: String, required: true },
-  email1: { type: String, required: true },
-  email2: { type: String, required: true },
-  bondType: { type: String, required: true },
-  bondDuration: { type: Number, required: true },
-  bondStartDate: { type: String, required: true },
-  bondEndDate: { type: String, required: true },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    // Changed from 'bondName' to 'name' for simplicity, matching the route
+    name: { 
+        type: String, 
+        required: true, 
+        trim: true 
+    },
+    type: { 
+        type: String, 
+        required: true 
+    },
+    duration: { // in days
+        type: Number, 
+        required: true 
+    },
+    startDate: { 
+        type: Date, 
+        required: true 
+    },
+    endDate: { 
+        type: Date, 
+        required: true 
+    },
+    // CRITICAL: Array of User Object IDs for both partners
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    }],
+    // The user who created the bond
+    creator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Bond", BondSchema);
