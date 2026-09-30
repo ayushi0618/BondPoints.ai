@@ -155,6 +155,35 @@
     .dash-hero { padding: 32px 20px; border-radius: 24px; }
     .history-item .h-date { display: none; }
   }
+
+  /* standout corner */
+  .standout-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 6px; }
+  .mini-card {
+    background: #fff; border-radius: 22px; border: 2px solid var(--pink-pale);
+    padding: 20px 16px; text-align: center; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+  }
+  .mini-card:hover { transform: translateY(-3px); transition: transform .2s ease; }
+  .mini-card .m-emoji-big { font-size: 2.2rem; }
+  .mini-card h3 { color: var(--pink-dark); font-size: 1.05rem; }
+  .mini-card p { font-size: .85rem; color: var(--ink-soft); line-height: 1.5; }
+  .mini-card .result-pill {
+    background: var(--pink-pale); border-radius: 999px; padding: 8px 16px;
+    font-size: .9rem; color: var(--pink-dark); font-weight: 600;
+  }
+  .quiz-opt {
+    display: block; width: 100%; text-align: left; margin: 8px 0; padding: 12px 14px;
+    border-radius: 16px; border: 2px solid var(--pink-pale); background: #fff;
+    font-size: .95rem; cursor: pointer; transition: all .15s ease; color: var(--ink);
+  }
+  .quiz-opt:hover { border-color: var(--pink); background: var(--pink-pale); transform: translateX(4px); }
+  .quiz-progress { font-size: .8rem; color: var(--ink-soft); margin-bottom: 4px; }
+  .spinner-name {
+    font-size: 1.6rem; font-weight: 800; color: var(--pink-dark);
+    min-height: 2.4em; display: flex; align-items: center; justify-content: center;
+  }
+  .challenge-done { font-size: 1rem; color: var(--pink-dark); font-weight: 700; }
+  .sev-btn { margin: 6px 4px; }
 </style>
 </head>
 <body data-theme="default">
@@ -238,6 +267,39 @@
       <div class="badges-grid" id="badgesGrid"></div>
     </div>
 
+    <!-- Standout corner -->
+    <div class="card" id="standoutSection">
+      <h2><span class="emoji">✨</span> Standout Corner — only on BondPoints</h2>
+      <div class="standout-grid">
+        <div class="mini-card">
+          <span class="m-emoji-big">💘</span>
+          <h3>Love Language Quiz</h3>
+          <p>Discover what makes each of you feel most loved — in 5 questions.</p>
+          <div id="loveLangResult"></div>
+          <button class="bp-btn bp-btn-sm" id="quizBtn">Take the quiz 💘</button>
+        </div>
+        <div class="mini-card">
+          <span class="m-emoji-big">🗓️</span>
+          <h3>Weekly Challenge</h3>
+          <p>A fresh couples challenge every week. Complete it for bonus points!</p>
+          <div id="challengeBox" style="width:100%"></div>
+        </div>
+        <div class="mini-card">
+          <span class="m-emoji-big">🥺</span>
+          <h3>Oops! Make-up Mode</h3>
+          <p>Messed up? Pick how bad it was — we'll suggest the perfect make-up move.</p>
+          <button class="bp-btn bp-btn-sm" id="oopsBtn">I messed up 🥺</button>
+        </div>
+        <div class="mini-card">
+          <span class="m-emoji-big">🎡</span>
+          <h3>Decision Spinner</h3>
+          <p>Can't decide who picks the movie? Let fate (and cuteness) decide.</p>
+          <div class="spinner-name" id="spinnerName">❓</div>
+          <button class="bp-btn bp-btn-sm" id="spinBtn">Spin! 🎡</button>
+        </div>
+      </div>
+    </div>
+
     <!-- History -->
     <div class="card" id="historySection">
       <h2><span class="emoji">📜</span> Our History</h2>
@@ -282,6 +344,9 @@
 </footer>
 
 <!-- Surprise date idea modal -->
+<div class="modal-overlay" id="surpriseModal">
+  <div class="modal-card" id="featureModalCard"></div>
+</div>
 <div class="modal-overlay" id="surpriseModal">
   <div class="modal-card">
     <span class="m-emoji" id="surpriseEmoji">💡</span>
@@ -400,6 +465,8 @@
         const b = data[0];
         document.getElementById('bondTitle').textContent =
           '💗 ' + b.yourName + ' & ' + b.partnerName + ' 💗';
+        window.BP_PARTNER = b.partnerName || 'Partner';
+        window.BP_YOU = b.yourName || 'You';
         let sub = (b.relationshipType || 'bond') + ' · growing stronger every day 🌸';
         if (b.startDate) {
           const days = Math.max(0, Math.round((Date.now() - new Date(b.startDate).getTime()) / 864e5));
@@ -802,9 +869,187 @@
     if (e.target === surpriseModal) surpriseModal.classList.remove('show');
   });
 
+
+  /* ---------- generic feature modal ---------- */
+  const featureModal = document.getElementById('featureModal');
+  const featureCard = document.getElementById('featureModalCard');
+  function openFeature(html) { featureCard.innerHTML = html; featureModal.classList.add('show'); }
+  function closeFeature() { featureModal.classList.remove('show'); }
+  featureModal.addEventListener('click', (e) => { if (e.target === featureModal) closeFeature(); });
+
+  /* ---------- love language quiz ---------- */
+  const LANGS = {
+    words: { emoji: '💬', name: 'Words of Affirmation', desc: 'Compliments, love notes and "I\'m proud of you" melt your heart.', tip: 'Tip for your partner: never underestimate a heartfelt text.' },
+    acts: { emoji: '🛠️', name: 'Acts of Service', desc: 'Actions speak loudest — chores done and problems solved.', tip: 'Tip for your partner: do one small task for them today.' },
+    gifts: { emoji: '🎁', name: 'Receiving Gifts', desc: 'Thoughtful little surprises say "I was thinking of you".', tip: 'Tip for your partner: it\'s the thought, not the price tag.' },
+    time: { emoji: '⏰', name: 'Quality Time', desc: 'Undivided attention is your favorite love language.', tip: 'Tip for your partner: put the phone down, be fully present.' },
+    touch: { emoji: '🤗', name: 'Physical Touch', desc: 'Hugs, hand-holding and closeness make you feel safest.', tip: 'Tip for your partner: reach for their hand more often.' }
+  };
+  const QUIZ = [
+    { q: 'Your partner surprises you! What melts your heart most?', opts: [
+      ['A handwritten love note', 'words'], ['They did your chores without asking', 'acts'],
+      ['A small thoughtful gift', 'gifts'], ['A planned date, just you two', 'time'], ['A long warm hug', 'touch']] },
+    { q: 'After a hard day, what do you crave most?', opts: [
+      ['Hearing "I\'m so proud of you"', 'words'], ['Dinner already made', 'acts'],
+      ['Your favorite snack waiting', 'gifts'], ['Cuddling on the couch together', 'time'], ['A soothing back rub', 'touch']] },
+    { q: 'The best "I love you" is...', opts: [
+      ['A heartfelt text out of nowhere', 'words'], ['Fixing something that annoyed you', 'acts'],
+      ['A present that shows they listen', 'gifts'], ['An evening of full attention', 'time'], ['Holding hands everywhere', 'touch']] },
+    { q: 'You feel most loved when your partner...', opts: [
+      ['Compliments you sincerely', 'words'], ['Helps without being asked', 'acts'],
+      ['Remembers you with little gifts', 'gifts'], ['Spends uninterrupted time', 'time'], ['Is physically affectionate', 'touch']] },
+    { q: 'Pick your perfect evening:', opts: [
+      ['Deep conversation till late', 'words'], ['They handled all the errands', 'acts'],
+      ['A surprise gift on the table', 'gifts'], ['Movie night, phones away', 'time'], ['Slow dancing in the living room', 'touch']] }
+  ];
+  let quizStep = 0, quizScores = {};
+  function startQuiz() {
+    quizStep = 0; quizScores = { words: 0, acts: 0, gifts: 0, time: 0, touch: 0 };
+    showQuizQ();
+  }
+  function showQuizQ() {
+    const item = QUIZ[quizStep];
+    let html = '<span class="m-emoji">💘</span><div class="quiz-progress">Question ' + (quizStep + 1) + ' of ' + QUIZ.length + '</div>' +
+      '<h3>' + item.q + '</h3><div style="text-align:left;margin-top:8px">';
+    item.opts.forEach((o, i) => {
+      html += '<button class="quiz-opt" data-lang="' + o[1] + '">' + o[0] + '</button>';
+    });
+    html += '</div>';
+    openFeature(html);
+    featureCard.querySelectorAll('.quiz-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        quizScores[btn.dataset.lang]++;
+        quizStep++;
+        if (quizStep < QUIZ.length) showQuizQ(); else showQuizResult();
+      });
+    });
+  }
+  function showQuizResult() {
+    let top = 'words';
+    Object.keys(quizScores).forEach(k => { if (quizScores[k] > quizScores[top]) top = k; });
+    const L = LANGS[top];
+    localStorage.setItem('bondPoints_loveLang', top);
+    openFeature('<span class="m-emoji">' + L.emoji + '</span>' +
+      '<h3>Your love language is...</h3>' +
+      '<p style="font-size:1.25rem;font-weight:800;color:var(--pink-dark)">' + L.name + '</p>' +
+      '<p>' + L.desc + '</p><p><i>' + L.tip + '</i></p>' +
+      '<button class="bp-btn" onclick="closeFeature()">💗 Got it!</button>');
+    launchConfetti();
+    renderLoveLang();
+  }
+  function renderLoveLang() {
+    const box = document.getElementById('loveLangResult');
+    const saved = localStorage.getItem('bondPoints_loveLang');
+    document.getElementById('quizBtn').textContent = saved ? 'Retake the quiz 💘' : 'Take the quiz 💘';
+    box.innerHTML = saved
+      ? '<div class="result-pill">' + LANGS[saved].emoji + ' ' + LANGS[saved].name + '</div>'
+      : '';
+  }
+  document.getElementById('quizBtn').addEventListener('click', startQuiz);
+
+  /* ---------- weekly couple challenge ---------- */
+  const CHALLENGES = [
+    { text: 'Give each other 3 genuine compliments today 💬', bonus: 25 },
+    { text: 'Phone-free dinner tonight — just you two 📵', bonus: 25 },
+    { text: 'Write each other a 3-line poem 📝', bonus: 30 },
+    { text: 'Cook a meal together from scratch 🍳', bonus: 30 },
+    { text: 'Share one childhood memory you\'ve never told 🧒', bonus: 20 },
+    { text: 'Take a 20-minute walk together, no agenda 🚶', bonus: 20 },
+    { text: 'Learn one brand-new thing about each other 💡', bonus: 20 },
+    { text: 'Plan a surprise for next week 🎁', bonus: 30 },
+    { text: 'Watch the sunset together 🌅', bonus: 20 },
+    { text: 'Thank each other for 3 little things 🙏', bonus: 25 }
+  ];
+  function weekKey() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+    const week1 = new Date(d.getFullYear(), 0, 4);
+    const week = 1 + Math.round(((d - week1) / 864e5 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+    return d.getFullYear() + '-W' + week;
+  }
+  function challengeState() {
+    try { return JSON.parse(localStorage.getItem('bondPoints_challenge') || '{}'); } catch (e) { return {}; }
+  }
+  function renderChallenge() {
+    const wk = weekKey();
+    const ch = CHALLENGES[[...wk].reduce((a, c) => a + c.charCodeAt(0), 0) % CHALLENGES.length];
+    const st = challengeState();
+    const box = document.getElementById('challengeBox');
+    if (st.week !== wk) { localStorage.setItem('bondPoints_challenge', JSON.stringify({ week: wk, accepted: false, done: false })); }
+    const cur = challengeState();
+    let html = '<p style="font-weight:600;color:var(--ink)">' + ch.text + '</p>' +
+      '<div class="result-pill">🏆 +' + ch.bonus + ' bonus pts</div>';
+    if (cur.done) {
+      html += '<div class="challenge-done">Completed! 🎉</div>';
+    } else if (cur.accepted) {
+      html += '<button class="bp-btn bp-btn-sm" id="challengeDoneBtn">Mark complete ✅</button>';
+    } else {
+      html += '<button class="bp-btn bp-btn-sm" id="challengeAcceptBtn">Accept challenge 💪</button>';
+    }
+    box.innerHTML = html;
+    const acc = document.getElementById('challengeAcceptBtn');
+    if (acc) acc.addEventListener('click', () => {
+      localStorage.setItem('bondPoints_challenge', JSON.stringify({ week: wk, accepted: true, done: false }));
+      renderChallenge(); bpToast('Challenge accepted! Go get em 💪', 'success');
+    });
+    const done = document.getElementById('challengeDoneBtn');
+    if (done) done.addEventListener('click', () => {
+      localStorage.setItem('bondPoints_challenge', JSON.stringify({ week: wk, accepted: true, done: true }));
+      addPoints(ch.bonus, 'Weekly challenge complete', '🏆');
+      renderChallenge();
+    });
+  }
+
+  /* ---------- oops! make-up mode ---------- */
+  const OOPS = {
+    small: ['Their favorite snack, delivered with your goofiest apology face 🍫', 'A handwritten "I\'m sorry" note (texts don\'t count!) 💌', 'Do one of their chores today without being asked 🧹'],
+    medium: ['Cook their favorite meal from scratch 🍳', 'Plan a surprise date this weekend 🌙', 'Write a real apology letter — pen, paper, feelings ✍️'],
+    big: ['Recreate your first date, as close as you can 💫', 'Give them space + their favorite comfort food 🛋️', 'Ask what they need to feel okay — then truly listen 🤍']
+  };
+  document.getElementById('oopsBtn').addEventListener('click', () => {
+    openFeature('<span class="m-emoji">🥺</span><h3>Oops! How bad was it?</h3>' +
+      '<div><button class="bp-btn-ghost bp-btn-sm sev-btn" data-sev="small">Small oops 🥺</button>' +
+      '<button class="bp-btn-ghost bp-btn-sm sev-btn" data-sev="medium">Medium mess-up 😬</button>' +
+      '<button class="bp-btn-ghost bp-btn-sm sev-btn" data-sev="big">Big uh-oh 😱</button></div>');
+    featureCard.querySelectorAll('.sev-btn').forEach(b =>
+      b.addEventListener('click', () => showOopsFix(b.dataset.sev)));
+  });
+  function showOopsFix(sev) {
+    const ideas = OOPS[sev];
+    const idea = ideas[(Math.random() * ideas.length) | 0];
+    openFeature('<span class="m-emoji">💡</span><h3>Your make-up mission:</h3>' +
+      '<p style="font-size:1.05rem">' + idea + '</p>' +
+      '<div class="row" style="display:flex;gap:10px;justify-content:center">' +
+      '<button class="bp-btn-ghost bp-btn-sm" id="oopsAgain">🔀 Another idea</button>' +
+      '<button class="bp-btn bp-btn-sm" onclick="closeFeature()">💗 I\'ll make it right</button></div>');
+    document.getElementById('oopsAgain').addEventListener('click', () => showOopsFix(sev));
+  }
+
+  /* ---------- decision spinner ---------- */
+  document.getElementById('spinBtn').addEventListener('click', () => {
+    const el = document.getElementById('spinnerName');
+    const btn = document.getElementById('spinBtn');
+    const p1 = (window.BP_YOU || 'You') + ' 💗';
+    const p2 = (window.BP_PARTNER || 'Partner') + ' 💕';
+    btn.disabled = true;
+    let ticks = 0;
+    const iv = setInterval(() => {
+      el.textContent = (ticks % 2 === 0) ? p1 : p2;
+      ticks++;
+      if (ticks > 14) {
+        clearInterval(iv);
+        const winner = Math.random() < 0.5 ? p1 : p2;
+        el.textContent = '🎉 ' + winner + ' decides!';
+        btn.disabled = false;
+        launchConfetti();
+      }
+    }, 90);
+  });
+
   /* ---------- init ---------- */
   function renderAll() {
-    renderStats(); renderRewards(); renderHistory(); renderGoals(); renderMoods(); drawMoodChart(); renderBadges();
+    renderStats(); renderRewards(); renderHistory(); renderGoals(); renderMoods(); drawMoodChart(); renderBadges(); renderLoveLang(); renderChallenge();
   }
   loadState();
   updateStreak();
