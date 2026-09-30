@@ -74,7 +74,7 @@
     if (password.length < 6) { bpToast('Password needs at least 6 characters 🥺', 'error'); return; }
     btn.disabled = true; btn.textContent = 'Creating your account... 💭';
     try {
-      const { ok, data } = await bpApi('/api/auth/register', {
+      const { ok, data } = await bpApi('/api/auth/signup', {
         method: 'POST', body: JSON.stringify({ name, email, password })
       });
       if (ok && data.token) {
