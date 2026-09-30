@@ -1,7 +1,10 @@
 // frontend/js/login.js
 
-// IMPORTANT: Set your backend API URL here
-const API_BASE_URL = 'http://localhost:5000/api/auth'; // Adjust if your port/path is different
+// IMPORTANT: Set your backend API URL here.
+// Override by setting window.BONDPOINTS_API_BASE before this script loads,
+// e.g. <script>window.BONDPOINTS_API_BASE = "http://localhost:5000";</script>
+// Defaults to the production Render backend so deploys keep working.
+const API_BASE_URL = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "") + '/api/auth';
 
 // ==========================================================
 // LOGIN FORM SUBMISSION HANDLER
