@@ -117,6 +117,39 @@
   }
   .mood-opt input:checked + span { border-color: var(--pink); background: var(--pink-pale); transform: scale(1.08); }
 
+  /* badges */
+  .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 6px; }
+  .badge {
+    text-align: center; padding: 18px 10px; border-radius: 20px;
+    border: 2px solid var(--pink-pale); background: #fffdfd; transition: transform .2s ease;
+  }
+  .badge:hover { transform: translateY(-4px) rotate(1deg); }
+  .badge .b-emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+  .badge.locked { opacity: .45; filter: grayscale(.8); }
+  .badge.unlocked { border-color: var(--pink-soft); box-shadow: var(--shadow); background: linear-gradient(180deg, #fff, var(--pink-pale)); }
+  .badge.unlocked .b-emoji { animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .badge b { display: block; color: var(--pink-dark); font-size: .92rem; margin-bottom: 4px; }
+  .badge span { font-size: .78rem; color: var(--ink-soft); }
+
+  /* surprise modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(91, 58, 71, .45); z-index: 9000;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: auto; }
+  .modal-card {
+    background: #fff; border-radius: 28px; border: 3px solid var(--pink-soft);
+    max-width: 420px; width: 100%; padding: 34px 28px; text-align: center;
+    box-shadow: var(--shadow-lg); transform: scale(.9); transition: transform .25s ease;
+  }
+  .modal-overlay.show .modal-card { transform: scale(1); }
+  .modal-card .m-emoji { font-size: 3rem; display: block; margin-bottom: 12px; }
+  .modal-card h3 { color: var(--pink-dark); font-size: 1.3rem; margin-bottom: 10px; }
+  .modal-card p { color: var(--ink); font-size: 1.05rem; line-height: 1.6; margin-bottom: 22px; }
+  .modal-card .row { display: flex; gap: 10px; justify-content: center; }
+
   @media (max-width: 720px) {
     .form-card-grid { grid-template-columns: 1fr; }
     .dash-hero { padding: 32px 20px; border-radius: 24px; }
@@ -184,6 +217,9 @@
     <!-- Rewards -->
     <div class="card" id="rewardsSection">
       <h2><span class="emoji">🎁</span> Rewards — treat yourselves!</h2>
+      <div class="center" style="margin-bottom:16px">
+        <button class="bp-btn-ghost bp-btn-sm" id="surpriseBtn">💡 Surprise Me — date idea!</button>
+      </div>
       <div class="rewards-grid" id="rewardsGrid"></div>
       <h3 style="margin:22px 0 12px;color:var(--pink-dark)">➕ Create a custom reward</h3>
       <form id="customRewardForm">
@@ -194,6 +230,12 @@
         <button type="submit" class="bp-btn bp-btn-sm">💗 Add Custom Reward</button>
       </form>
       <div class="mt-2"><button class="btn-small btn-danger" id="resetDemoBtn">🔄 Reset Demo Data</button></div>
+    </div>
+
+    <!-- Badges -->
+    <div class="card" id="badgesSection">
+      <h2><span class="emoji">🏅</span> Achievement Badges</h2>
+      <div class="badges-grid" id="badgesGrid"></div>
     </div>
 
     <!-- History -->
@@ -238,6 +280,19 @@
   <div class="hearts">💗 💕 💖 💕 💗</div>
   <p class="mt-1">Made with love · BondPoints © 2026</p>
 </footer>
+
+<!-- Surprise date idea modal -->
+<div class="modal-overlay" id="surpriseModal">
+  <div class="modal-card">
+    <span class="m-emoji" id="surpriseEmoji">💡</span>
+    <h3>Your surprise date idea ✨</h3>
+    <p id="surpriseText"></p>
+    <div class="row">
+      <button class="bp-btn-ghost bp-btn-sm" id="surpriseAgain">🔀 Another one</button>
+      <button class="bp-btn bp-btn-sm" id="surpriseClose">💗 Love it!</button>
+    </div>
+  </div>
+</div>
 
 <script src="js/common.js"></script>
 <script>
@@ -332,7 +387,7 @@
     const history = JSON.parse(localStorage.getItem('bondPoints_history') || '[]');
     history.unshift({ description, points, emoji: emoji || '💗', date: new Date().toLocaleString() });
     localStorage.setItem('bondPoints_history', JSON.stringify(history.slice(0, 50)));
-    renderStats(); renderHistory();
+    renderStats(); renderHistory(); renderBadges();
     bpToast('+' + points + ' points! ' + (emoji || '💗'), 'success');
     launchConfetti();
   }
@@ -346,7 +401,11 @@
         document.getElementById('bondTitle').textContent =
           '💗 ' + b.yourName + ' & ' + b.partnerName + ' 💗';
         let sub = (b.relationshipType || 'bond') + ' · growing stronger every day 🌸';
-        if (b.startDate) sub = 'Together since ' + new Date(b.startDate).toLocaleDateString() + ' 🌸 ' + sub;
+        if (b.startDate) {
+          const days = Math.max(0, Math.round((Date.now() - new Date(b.startDate).getTime()) / 864e5));
+          sub = 'Together since ' + new Date(b.startDate).toLocaleDateString() +
+            ' · ' + days + (days === 1 ? ' day' : ' days') + ' of love 🌸 ' + sub;
+        }
         document.getElementById('bondSubtitle').textContent = sub;
       } else {
         document.getElementById('bondSubtitle').textContent = 'Your love story starts here 🌸';
@@ -452,7 +511,7 @@
     state.rewardsClaimed += 1;
     r.claimed = true;
     setRewards(rewards); saveState();
-    renderRewards(); renderStats();
+    renderRewards(); renderStats(); renderBadges();
     bpToast('Enjoy your "' + r.name + '"! ' + (r.emoji || '🎁'), 'success');
     launchConfetti();
   }
@@ -561,7 +620,7 @@
     } else {
       bpToast('+10 pts to "' + g.name + '"! 💗', 'success');
     }
-    setGoals(goals); renderGoals();
+    setGoals(goals); renderGoals(); renderBadges();
   }
 
   /* ---------- moods ---------- */
@@ -577,7 +636,7 @@
     moods.unshift({ mood: picked.value, date: new Date().toLocaleString() });
     localStorage.setItem('bondPoints_moods', JSON.stringify(moods.slice(0, 30)));
     picked.checked = false;
-    renderMoods(); drawMoodChart();
+    renderMoods(); drawMoodChart(); renderBadges();
     bpToast('Mood logged! ' + MOODS[picked.value].emoji, 'success');
   });
 
@@ -665,9 +724,87 @@
     }
   }
 
+  /* ---------- achievement badges ---------- */
+  const BADGES = [
+    { id: 'first', emoji: '💗', name: 'First Steps', desc: 'Log your first sweet moment',
+      check: () => historyCount() >= 1 },
+    { id: 'century', emoji: '💎', name: 'Century Club', desc: 'Reach 100 total points',
+      check: () => state.points >= 100 },
+    { id: 'streak3', emoji: '🔥', name: 'On Fire', desc: 'Keep a 3-day streak',
+      check: () => state.streak >= 3 },
+    { id: 'generous', emoji: '🎁', name: 'Generous Heart', desc: 'Claim your first reward',
+      check: () => state.rewardsClaimed >= 1 },
+    { id: 'dreamteam', emoji: '🎯', name: 'Dream Team', desc: 'Complete a shared goal',
+      check: () => getGoals().some(g => g.completed) },
+    { id: 'intune', emoji: '😊', name: 'In Tune', desc: 'Log 3 moods',
+      check: () => moodCount() >= 3 }
+  ];
+  function historyCount() {
+    try { return (JSON.parse(localStorage.getItem('bondPoints_history') || '[]')).length; } catch (e) { return 0; }
+  }
+  function moodCount() {
+    try { return (JSON.parse(localStorage.getItem('bondPoints_moods') || '[]')).length; } catch (e) { return 0; }
+  }
+  function unlockedBadges() {
+    try { return JSON.parse(localStorage.getItem('bondPoints_badges') || '[]'); } catch (e) { return []; }
+  }
+  function renderBadges() {
+    const grid = document.getElementById('badgesGrid');
+    const unlocked = unlockedBadges();
+    const newly = [];
+    grid.innerHTML = '';
+    BADGES.forEach(b => {
+      const isUp = b.check();
+      if (isUp && !unlocked.includes(b.id)) { unlocked.push(b.id); newly.push(b); }
+      const div = document.createElement('div');
+      div.className = 'badge ' + (isUp ? 'unlocked' : 'locked');
+      div.innerHTML = '<span class="b-emoji">' + (isUp ? b.emoji : '🔒') + '</span>' +
+        '<b>' + b.name + '</b><span>' + b.desc + '</span>';
+      grid.appendChild(div);
+    });
+    if (newly.length) {
+      localStorage.setItem('bondPoints_badges', JSON.stringify(unlocked));
+      const b = newly[0];
+      setTimeout(() => bpToast('New badge unlocked: ' + b.emoji + ' ' + b.name + '!', 'success'), 800);
+      launchConfetti();
+    }
+  }
+
+  /* ---------- surprise date idea generator ---------- */
+  const DATE_IDEAS = [
+    { emoji: '🧺', text: 'Pack a picnic and watch the sunset at your favorite spot.' },
+    { emoji: '🎨', text: 'Paint portraits of each other — the worse, the funnier!' },
+    { emoji: '🌙', text: 'Go stargazing with hot chocolate and a cozy blanket.' },
+    { emoji: '🍳', text: 'Cook a brand-new recipe together from scratch.' },
+    { emoji: '🚲', text: 'Take a spontaneous bike ride to somewhere new.' },
+    { emoji: '🎬', text: 'Build a blanket fort and marathon your favorite movies.' },
+    { emoji: '💌', text: 'Write each other love letters and read them aloud.' },
+    { emoji: '🪴', text: 'Visit a plant nursery and pick a plant to raise together.' },
+    { emoji: '🎤', text: 'Belt out your hearts at a karaoke night.' },
+    { emoji: '📸', text: 'Do a silly photo walk — 20 photos, zero filters.' },
+    { emoji: '☕', text: 'Café-hop: rate every coffee shop within walking distance.' },
+    { emoji: '🧩', text: 'Tackle a 1000-piece puzzle over the weekend.' }
+  ];
+  const surpriseModal = document.getElementById('surpriseModal');
+  function showSurprise() {
+    const idea = DATE_IDEAS[(Math.random() * DATE_IDEAS.length) | 0];
+    document.getElementById('surpriseEmoji').textContent = idea.emoji;
+    document.getElementById('surpriseText').textContent = idea.text;
+    surpriseModal.classList.add('show');
+  }
+  document.getElementById('surpriseBtn').addEventListener('click', showSurprise);
+  document.getElementById('surpriseAgain').addEventListener('click', showSurprise);
+  document.getElementById('surpriseClose').addEventListener('click', () => {
+    surpriseModal.classList.remove('show');
+    bpToast('Have the best time! 💗', 'success');
+  });
+  surpriseModal.addEventListener('click', (e) => {
+    if (e.target === surpriseModal) surpriseModal.classList.remove('show');
+  });
+
   /* ---------- init ---------- */
   function renderAll() {
-    renderStats(); renderRewards(); renderHistory(); renderGoals(); renderMoods(); drawMoodChart();
+    renderStats(); renderRewards(); renderHistory(); renderGoals(); renderMoods(); drawMoodChart(); renderBadges();
   }
   loadState();
   updateStreak();
