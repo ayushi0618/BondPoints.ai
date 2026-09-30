@@ -453,7 +453,7 @@
     const history = JSON.parse(localStorage.getItem('bondPoints_history') || '[]');
     history.unshift({ description, points, emoji: emoji || '💗', date: new Date().toLocaleString() });
     localStorage.setItem('bondPoints_history', JSON.stringify(history.slice(0, 50)));
-    renderStats(); renderHistory(); renderBadges();
+    renderStats(); renderHistory(); renderBadges(); renderRewards();
     bpToast('+' + points + ' points! ' + (emoji || '💗'), 'success');
     launchConfetti();
   }
