@@ -343,10 +343,11 @@
   <p class="mt-1">Made with love · BondPoints © 2026</p>
 </footer>
 
-<!-- Surprise date idea modal -->
-<div class="modal-overlay" id="surpriseModal">
+<!-- Generic feature modal (quiz, oops, confirm dialogs) -->
+<div class="modal-overlay" id="featureModal">
   <div class="modal-card" id="featureModalCard"></div>
 </div>
+<!-- Surprise date idea modal -->
 <div class="modal-overlay" id="surpriseModal">
   <div class="modal-card">
     <span class="m-emoji" id="surpriseEmoji">💡</span>
@@ -458,21 +459,34 @@
   }
 
   /* ---------- bond info from API ---------- */
+  function myUserId() {
+    try { return JSON.parse(atob((bpGetToken() || '').split('.')[1])).user.id; }
+    catch (e) { return null; }
+  }
   async function loadBond() {
     try {
       const { ok, data } = await bpApi('/api/bonds');
       if (ok && data && data.length) {
         const b = data[0];
+        const users = b.users || [];
+        const mid = myUserId();
+        const idOf = (u) => String(u._id || u.id || '');
+        const me = users.find(u => mid && idOf(u) === String(mid)) || users[0] || {};
+        const partner = users.find(u => !(mid && idOf(u) === String(mid))) || users[1] || {};
+        const meName = me.name || 'You';
+        const partnerName = partner.name || 'Partner';
         document.getElementById('bondTitle').textContent =
-          '💗 ' + b.yourName + ' & ' + b.partnerName + ' 💗';
-        window.BP_PARTNER = b.partnerName || 'Partner';
-        window.BP_YOU = b.yourName || 'You';
-        let sub = (b.relationshipType || 'bond') + ' · growing stronger every day 🌸';
+          '💗 ' + meName + ' & ' + partnerName + ' 💗';
+        window.BP_PARTNER = partnerName;
+        window.BP_YOU = meName;
+        const typeLabel = { friendship: 'besties', relationship: 'romantic', marriage: 'married' }[b.type] || b.type || 'bond';
+        let sub = typeLabel + ' · growing stronger every day 🌸';
         if (b.startDate) {
           const days = Math.max(0, Math.round((Date.now() - new Date(b.startDate).getTime()) / 864e5));
           sub = 'Together since ' + new Date(b.startDate).toLocaleDateString() +
             ' · ' + days + (days === 1 ? ' day' : ' days') + ' of love 🌸 ' + sub;
         }
+        if (b.name) sub += ' · "' + b.name + '"';
         document.getElementById('bondSubtitle').textContent = sub;
       } else {
         document.getElementById('bondSubtitle').textContent = 'Your love story starts here 🌸';
@@ -597,11 +611,19 @@
   });
 
   document.getElementById('resetDemoBtn').addEventListener('click', () => {
-    if (!confirm('Reset all demo data (points, rewards, goals, moods)?')) return;
-    ['bondPoints_state', 'bondPoints_rewards', 'bondPoints_goals', 'bondPoints_moods', 'bondPoints_history']
-      .forEach(k => localStorage.removeItem(k));
-    loadState(); updateStreak(); renderAll();
-    bpToast('Fresh start! 🌸');
+    openFeature('<span class="m-emoji">🔄</span><h3>Fresh start?</h3>' +
+      '<p>This clears points, rewards, goals and moods on this device. Your account and bond stay safe. 💗</p>' +
+      '<div class="row" style="display:flex;gap:10px;justify-content:center">' +
+      '<button class="bp-btn-ghost bp-btn-sm" id="keepDataBtn">Keep my data</button>' +
+      '<button class="bp-btn bp-btn-sm" id="confirmResetBtn">Reset it 🌸</button></div>');
+    document.getElementById('keepDataBtn').addEventListener('click', closeFeature);
+    document.getElementById('confirmResetBtn').addEventListener('click', () => {
+      ['bondPoints_state', 'bondPoints_rewards', 'bondPoints_goals', 'bondPoints_moods', 'bondPoints_history', 'bondPoints_challenge', 'bondPoints_loveLang', 'bondPoints_badges']
+        .forEach(k => localStorage.removeItem(k));
+      closeFeature();
+      loadState(); updateStreak(); renderAll();
+      bpToast('Fresh start! 🌸');
+    });
   });
 
   /* ---------- history ---------- */
@@ -875,6 +897,7 @@
   const featureCard = document.getElementById('featureModalCard');
   function openFeature(html) { featureCard.innerHTML = html; featureModal.classList.add('show'); }
   function closeFeature() { featureModal.classList.remove('show'); }
+  window.openFeature = openFeature; window.closeFeature = closeFeature;
   featureModal.addEventListener('click', (e) => { if (e.target === featureModal) closeFeature(); });
 
   /* ---------- love language quiz ---------- */

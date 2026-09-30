@@ -7,24 +7,25 @@
 <link rel="stylesheet" href="css/cute.css">
 <style>
   .setup-wrap { min-height: calc(100vh - 130px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 1; }
-  .setup-card { width: 100%; max-width: 520px; text-align: center; }
+  .setup-card { width: 100%; max-width: 560px; text-align: center; }
   .setup-card h1 { color: var(--pink-dark); font-size: 1.8rem; margin-bottom: 6px; }
   .setup-card .sub { color: var(--ink-soft); margin-bottom: 24px; font-size: .98rem; }
   .setup-card form { text-align: left; }
   .setup-emoji { font-size: 2.6rem; margin-bottom: 10px; display: inline-block; animation: floaty 3s ease-in-out infinite; }
   @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-  .rel-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-  .rel-pill { flex: 1 1 30%; min-width: 110px; }
-  .rel-pill input { display: none; }
-  .rel-pill span {
+  .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .pill { flex: 1 1 30%; min-width: 110px; }
+  .pill input { display: none; }
+  .pill span {
     display: block; text-align: center; padding: 12px 8px; border-radius: 16px;
     border: 2px solid var(--pink-pale); background: #fffdfd; cursor: pointer;
     font-weight: 700; font-size: .92rem; transition: all .2s ease;
   }
-  .rel-pill input:checked + span {
+  .pill input:checked + span {
     border-color: var(--pink); background: var(--pink-pale); color: var(--pink-dark);
     box-shadow: 0 6px 16px rgba(255,107,158,.25); transform: translateY(-2px);
   }
+  .hint { font-size: .8rem; color: var(--ink-soft); margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -43,29 +44,48 @@
   <div class="card setup-card">
     <span class="setup-emoji">💞</span>
     <h1>Create your Bond</h1>
-    <p class="sub">Tell us about your special someone ✨</p>
+    <p class="sub">Link up with your special someone ✨</p>
     <form id="bondForm">
+      <div class="field">
+        <label for="bondName">Give your bond a name 💞</label>
+        <input type="text" id="bondName" placeholder="e.g. Yash & Ayushi" required>
+      </div>
       <div class="field-row">
         <div class="field">
-          <label for="yourName">Your name</label>
-          <input type="text" id="yourName" placeholder="You 💗" required>
+          <label for="email1">Your email</label>
+          <input type="email" id="email1" placeholder="you@example.com" required>
         </div>
         <div class="field">
-          <label for="partnerName">Their name</label>
-          <input type="text" id="partnerName" placeholder="Them 💕" required>
+          <label for="email2">Their email</label>
+          <input type="email" id="email2" placeholder="them@example.com" required>
+          <p class="hint">They need a BondPoints account too 💕</p>
         </div>
       </div>
       <div class="field">
         <label>What are you two? 💭</label>
-        <div class="rel-pills">
-          <label class="rel-pill"><input type="radio" name="relationshipType" value="romantic" checked><span>💑 Romantic</span></label>
-          <label class="rel-pill"><input type="radio" name="relationshipType" value="friendship"><span>👯 Besties</span></label>
-          <label class="rel-pill"><input type="radio" name="relationshipType" value="family"><span>👨‍👩‍👧 Family</span></label>
+        <div class="pill-row">
+          <label class="pill"><input type="radio" name="bondType" value="friendship" checked><span>👯 Besties</span></label>
+          <label class="pill"><input type="radio" name="bondType" value="relationship"><span>💑 Romantic</span></label>
+          <label class="pill"><input type="radio" name="bondType" value="marriage"><span>💍 Married</span></label>
         </div>
       </div>
       <div class="field">
-        <label for="startDate">When did it start? 🌸</label>
-        <input type="date" id="startDate">
+        <label>How long is this bond? ⏳</label>
+        <div class="pill-row">
+          <label class="pill"><input type="radio" name="bondDuration" value="7"><span>7 days</span></label>
+          <label class="pill"><input type="radio" name="bondDuration" value="30" checked><span>30 days</span></label>
+          <label class="pill"><input type="radio" name="bondDuration" value="90"><span>90 days</span></label>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="bondStartDate">Start date 🌸</label>
+          <input type="date" id="bondStartDate" required>
+        </div>
+        <div class="field">
+          <label for="bondEndDate">End date 🌷</label>
+          <input type="date" id="bondEndDate" required>
+        </div>
       </div>
       <button type="submit" class="bp-btn bp-btn-block" id="bondSubmit">💞 Create our bond</button>
     </form>
@@ -84,18 +104,37 @@
 
   document.getElementById('logoutBtn').addEventListener('click', bpLogout);
 
+  const startEl = document.getElementById('bondStartDate');
+  const endEl = document.getElementById('bondEndDate');
+  const today = new Date().toISOString().split('T')[0];
+  startEl.value = today;
+
+  function syncEndDate() {
+    const days = parseInt(document.querySelector('input[name="bondDuration"]:checked').value, 10);
+    const d = new Date(startEl.value || today);
+    d.setDate(d.getDate() + days);
+    endEl.value = d.toISOString().split('T')[0];
+  }
+  startEl.addEventListener('change', syncEndDate);
+  document.querySelectorAll('input[name="bondDuration"]').forEach(r =>
+    r.addEventListener('change', syncEndDate));
+  syncEndDate();
+
   document.getElementById('bondForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('bondSubmit');
-    const yourName = document.getElementById('yourName').value.trim();
-    const partnerName = document.getElementById('partnerName').value.trim();
-    const relationshipType = document.querySelector('input[name="relationshipType"]:checked').value;
-    const startDate = document.getElementById('startDate').value || null;
+    const payload = {
+      bondName: document.getElementById('bondName').value.trim(),
+      email1: document.getElementById('email1').value.trim(),
+      email2: document.getElementById('email2').value.trim(),
+      bondType: document.querySelector('input[name="bondType"]:checked').value,
+      bondDuration: parseInt(document.querySelector('input[name="bondDuration"]:checked').value, 10),
+      bondStartDate: startEl.value,
+      bondEndDate: endEl.value
+    };
     btn.disabled = true; btn.textContent = 'Creating your bond... 💭';
     try {
-      const { ok, data } = await bpApi('/api/bonds', {
-        method: 'POST', body: JSON.stringify({ yourName, partnerName, relationshipType, startDate })
-      });
+      const { ok, data } = await bpApi('/api/bonds', { method: 'POST', body: JSON.stringify(payload) });
       if (ok) {
         bpToast('Your bond is created! 💞', 'success');
         setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
