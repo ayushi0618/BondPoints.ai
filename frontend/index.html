@@ -219,6 +219,10 @@
   </section>
 
 <script>
+  // Backend API base. Override with window.BONDPOINTS_API_BASE
+  // (e.g. "http://localhost:5000" for local dev). Defaults to the
+  // production Render backend so deploys keep working.
+  const API_BASE = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "");
   // Show/hide login form
   function showLogin() {
     document.getElementById('login').style.display = 'block';
@@ -238,7 +242,7 @@
     const password = document.getElementById('password').value.trim();
     
     // Ensure the correct base URL is used (adjust if needed)
-    const API_URL = "http://localhost:5000/api/auth/login";
+    const API_URL = API_BASE + "/api/auth/login";
 
     try {
       const res = await fetch(API_URL, {

@@ -195,6 +195,10 @@
 </div>
 
 <script>
+    // Backend API base. Override with window.BONDPOINTS_API_BASE
+    // (e.g. "http://localhost:5000" for local dev). Defaults to the
+    // production Render backend so deploys keep working.
+    const API_BASE = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "");
     // Heart animation
     const heartsContainer = document.getElementById('hearts');
     for(let i=0; i<30; i++){
@@ -242,7 +246,7 @@
         `;
 
         try {
-            const res = await fetch("http://localhost:5000/api/bonds", {
+            const res = await fetch(API_BASE + "/api/bonds", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -285,7 +289,7 @@
             return;
         }
 
-        const res = await fetch("http://localhost:5000/api/bonds", {
+        const res = await fetch(API_BASE + "/api/bonds", {
           headers: { "x-auth-token": currentToken }
         });
         if (!res.ok) {

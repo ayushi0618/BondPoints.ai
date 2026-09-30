@@ -130,6 +130,10 @@
     <p class="login-link">Already have an account? <a href="index.html">Login</a></p>
 </div>
 <script>
+    // Backend API base. Override with window.BONDPOINTS_API_BASE
+    // (e.g. "http://localhost:5000" for local dev). Defaults to the
+    // production Render backend so deploys keep working.
+    const API_BASE = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "");
     // Floating hearts
     for(let i=0;i<30;i++){
         let heart = document.createElement('div');
@@ -156,7 +160,7 @@ document.getElementById('signupForm').addEventListener('submit', async function(
     }
     
     // Ensure the correct base URL is used (adjust if needed)
-    const API_URL = "http://localhost:5000/api/auth/signup";
+    const API_URL = API_BASE + "/api/auth/signup";
 
     try {
         const res = await fetch(API_URL, {
