@@ -1,379 +1,245 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BondPoints</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
-    html { scroll-behavior: smooth; }
-    body { background-color: #111; color:#fff; overflow-x:hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BondPoints 💗 — Grow Closer, One Point at a Time</title>
+<meta name="description" content="BondPoints is a cute way to celebrate your relationships — earn points for thoughtful gestures, unlock rewards, and grow your bond together.">
+<link rel="stylesheet" href="css/cute.css">
+<style>
+  .hero { text-align: center; padding: 90px 0 60px; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-block; background: #fff; border: 2px solid var(--pink-soft);
+    color: var(--pink-dark); font-weight: 700; font-size: .9rem;
+    padding: 8px 20px; border-radius: 999px; margin-bottom: 22px;
+    box-shadow: var(--shadow);
+  }
+  .hero h1 { font-size: clamp(2.2rem, 5.5vw, 3.6rem); color: var(--ink); line-height: 1.15; margin-bottom: 18px; }
+  .hero h1 .pink { color: var(--pink-dark); }
+  .hero p.lead { font-size: 1.15rem; color: var(--ink-soft); max-width: 620px; margin: 0 auto 32px; line-height: 1.7; }
+  .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .hero-hearts { font-size: 2rem; letter-spacing: 10px; margin-bottom: 10px; animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-    /* Navbar */
-    .navbar {
-      background: linear-gradient(90deg, #ff7eb9, #89f7fe);
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-    .navbar a {
-      color: white;
-      text-decoration: none;
-      margin-left: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .navbar a:hover { text-decoration: underline; }
+  .stats { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 44px; }
+  .stat {
+    background: #fff; border: 2px solid var(--pink-pale); border-radius: 20px;
+    padding: 16px 26px; box-shadow: var(--shadow); min-width: 150px;
+  }
+  .stat b { display: block; font-family: 'Quicksand'; font-size: 1.5rem; color: var(--pink-dark); }
+  .stat span { font-size: .88rem; color: var(--ink-soft); font-weight: 600; }
 
-    /* Sections */
-    section { padding: 80px 20px; max-width: 1000px; margin: auto; border-radius:10px; background-color:white; margin-bottom:40px; box-shadow:0 0 10px rgba(0,0,0,0.1); color:#333; }
-    h1,h2 { color:#ff7eb9; margin-bottom:15px; text-align:center; }
-    p { margin-bottom:15px; line-height:1.6; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .feature-card { text-align: center; transition: transform .2s ease; }
+  .feature-card:hover { transform: translateY(-6px) rotate(-.5deg); }
+  .feature-card .f-emoji { font-size: 2.6rem; display: block; margin-bottom: 12px; }
+  .feature-card h3 { color: var(--pink-dark); margin-bottom: 8px; font-size: 1.15rem; }
+  .feature-card p { color: var(--ink-soft); font-size: .96rem; line-height: 1.6; }
 
-    /* Home / Hero */
-    #home {
-      text-align:center;
-      padding:150px 20px;
-      border-radius:0;
-      box-shadow:none;
-      background: url('https://share.google/images/xqRHkEHerSUUTvho8') no-repeat center center/cover;
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-    }
-    #home h1 { font-size: 48px; margin-bottom:20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.7); }
-    #home p { font-size: 20px; margin-bottom:15px; text-shadow: 1px 1px 4px rgba(0,0,0,0.7); }
-    #home .btn {
-      padding:15px 30px;
-      font-size:18px;
-      margin:10px;
-      background: linear-gradient(90deg, #ff7eb9, #ff4da6);
-      color:white;
-      border:none;
-      border-radius:5px;
-      cursor:pointer;
-      font-weight:bold;
-      transition: 0.3s;
-      z-index: 2;
-      position: relative;
-    }
-    #home .btn:hover { opacity:0.9; transform: scale(1.05); }
+  .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .testi .quote { font-size: 2rem; color: var(--pink-soft); line-height: 1; }
+  .testi p { font-style: italic; color: var(--ink); line-height: 1.65; margin: 8px 0 12px; }
+  .testi .who { font-weight: 800; color: var(--pink-dark); font-size: .92rem; }
+  .testi .stars { color: #ffb020; letter-spacing: 2px; font-size: .9rem; }
 
-    /* Floating hearts */
-    .heart {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: #ff7eb9;
-      transform: rotate(-45deg);
-      top: 100%;
-      border-radius: 5px 5px 0 0;
-      animation: floatUp linear infinite;
-      z-index:1;
-    }
-    .heart:before, .heart:after {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: #ff7eb9;
-      border-radius: 50%;
-    }
-    .heart:before { top: -10px; left: 0; }
-    .heart:after { left: 10px; top: 0; }
+  .cta-band {
+    background: linear-gradient(135deg, var(--pink), var(--pink-dark));
+    border-radius: 32px; padding: 52px 30px; text-align: center; color: #fff;
+    box-shadow: var(--shadow-lg); position: relative; overflow: hidden;
+  }
+  .cta-band::before {
+    content: '💗 💕 💗 💕 💗'; position: absolute; top: 14px; left: 0; right: 0;
+    opacity: .35; font-size: 1.2rem; letter-spacing: 14px;
+  }
+  .cta-band h2 { font-size: 1.9rem; margin-bottom: 10px; }
+  .cta-band p { opacity: .92; margin-bottom: 26px; font-size: 1.05rem; }
+  .cta-band .bp-btn { background: #fff; color: var(--pink-dark); box-shadow: 0 10px 24px rgba(0,0,0,.18); }
 
-    @keyframes floatUp {
-      0% { transform: translateY(0) rotate(-45deg) scale(1); opacity:1; }
-      100% { transform: translateY(-800px) rotate(-45deg) scale(0.5); opacity:0; }
-    }
+  #loginCard { max-width: 440px; margin: 0 auto; }
+  #loginCard h2 { justify-content: center; }
+  .login-switch { text-align: center; margin-top: 14px; color: var(--ink-soft); font-size: .95rem; }
+  .login-switch a { color: var(--pink-dark); font-weight: 700; }
 
-    /* Canvas for nodes & lines */
-    #bondCanvas {
-      position:absolute;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      z-index:0;
-      pointer-events:none;
-    }
-
-    /* Login Form */
-    #login { max-width:400px; margin:40px auto; padding:20px; display:none; text-align:center; background: #222; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.3);}
-    label { display:block; margin:10px 0 5px; text-align:left; color:#fff; }
-    input { width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px; background:#333; color:#fff; }
-    button.login-btn { width:100%; padding:10px; background: linear-gradient(90deg, #ff7eb9, #ff4da6); color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; }
-    button.login-btn:hover { opacity:0.9; }
-
-    /* Testimonial */
-    .testimonial { margin-bottom:20px; }
-    .testimonial p { font-style:italic; }
-    .testimonial .author { text-align:right; font-weight:bold; color:#ff7eb9; }
-
-    /* About Features */
-    .features { display:flex; flex-wrap:wrap; justify-content:space-around; margin-top:20px; }
-    .feature { flex:1 1 250px; margin:15px; padding:15px; border:1px solid #ffc0e0; border-radius:10px; box-shadow:0 0 5px rgba(0,0,0,0.05); background:#fff0f6;}
-    .feature h3 { color:#ff7eb9; margin-bottom:10px; text-align:center; }
-    .feature p { text-align:center; }
-
-    /* CTA in About */
-    .about-cta { text-align:center; margin-top:20px; }
-    .about-cta button { padding:12px 25px; font-size:16px; background: linear-gradient(90deg, #ff7eb9, #ff4da6); color:white; border:none; border-radius:5px; cursor:pointer; }
-    .about-cta button:hover { opacity:0.9; }
-
-    @media(max-width:768px) {
-      .features { flex-direction:column; align-items:center; }
-      #home h1 { font-size:36px; }
-      #home p { font-size:18px; }
-    }
-  </style>
+  @media (max-width: 720px) {
+    .hero { padding: 60px 0 40px; }
+    .stats { gap: 10px; } .stat { min-width: 44%; padding: 12px; }
+  }
+</style>
 </head>
 <body>
+<canvas id="heartsCanvas"></canvas>
 
-  <!-- Navbar -->
-  <div class="navbar">
-    <div class="logo" style="font-weight:bold; font-size:20px; color:white;">BondPoints</div>
-    <div class="nav-links">
-      <a href="#home" onclick="hideLogin()">Home</a>
-      <a href="#testimonial" onclick="hideLogin()">Testimonial</a>
-      <a href="#about" onclick="hideLogin()">About</a>
-      <a onclick="showLogin()">Login</a>
-    </div>
+<nav class="bp-nav">
+  <a class="bp-logo" href="#top"><span class="logo-heart">💗</span> BondPoints</a>
+  <button class="nav-toggle" aria-label="Menu">☰</button>
+  <div class="bp-nav-links">
+    <a href="#top">Home</a>
+    <a href="#features">Features</a>
+    <a href="#testimonials">Love Notes</a>
+    <a href="#about">About</a>
+    <span id="navAuth"></span>
   </div>
+</nav>
 
-  <!-- Home / Hero Section -->
-  <section id="home">
-    <canvas id="bondCanvas"></canvas>
-    <h1>Welcome to BondPoints</h1>
-    <p>Track your loyalty rewards effortlessly and make every point count!</p>
-    <p>Connect all your loyalty programs in one place and watch your points grow.</p>
-    <p>Save time, redeem faster, and never miss an opportunity again.</p>
-    <button class="btn" onclick="showLogin()">Login</button>
-    <button class="btn" onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})">Learn More</button>
-  </section>
+<header class="hero wrap" id="top">
+  <div class="hero-hearts">💗 💕 💖</div>
+  <div class="hero-badge">✨ the cutest way to grow closer ✨</div>
+  <h1>Turn little moments into <span class="pink">big love</span></h1>
+  <p class="lead">BondPoints celebrates your relationships — earn points for thoughtful gestures, unlock dreamy rewards together, and watch your bond bloom day after day.</p>
+  <div class="hero-ctas">
+    <a class="bp-btn" href="signup.html">💗 Start Your Story</a>
+    <button class="bp-btn-ghost" id="heroLoginBtn">Login</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>∞</b><span>moments to celebrate</span></div>
+    <div class="stat"><b>💯</b><span>points of pure love</span></div>
+    <div class="stat"><b>🏆</b><span>rewards to unlock</span></div>
+  </div>
+</header>
 
-  <!-- Login Form -->
-  <div id="login">
-    <h1>Login</h1>
+<!-- Login -->
+<section class="section wrap hidden" id="loginSection">
+  <div class="card" id="loginCard">
+    <h2><span class="emoji">🔑</span> Welcome back!</h2>
     <form id="loginForm">
-      <label for="email">Email:</label>
-      <input type="email" id="email" required>
-      <label for="password">Password:</label>
-      <input type="password" id="password" required>
-      <button type="submit" class="login-btn">Login</button>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="bp-btn bp-btn-block" id="loginSubmit">💗 Login</button>
     </form>
-    <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
+    <p class="login-switch">New here? <a href="signup.html">Create an account 💕</a></p>
   </div>
+</section>
 
-  <!-- Testimonial Section -->
-  <section id="testimonial">
-    <h2>Testimonials</h2>
-    <div class="testimonial">
-      <p>"BondPoints made tracking my rewards so simple. I never miss a point!"</p>
-      <div class="author">— Sarah J.</div>
+<!-- Features -->
+<section class="section wrap" id="features">
+  <h2 class="section-title">Made for sweethearts & besties 💕</h2>
+  <p class="section-sub">Everything you need to nurture your bond — wrapped in the cutest package ever.</p>
+  <div class="features-grid">
+    <div class="card feature-card">
+      <span class="f-emoji">💫</span>
+      <h3>Earn Love Points</h3>
+      <p>Surprised them with breakfast? Remembered the little things? Log it and watch your points sparkle.</p>
     </div>
-    <div class="testimonial">
-      <p>"All my loyalty programs in one place! It's convenient and efficient."</p>
-      <div class="author">— Michael R.</div>
+    <div class="card feature-card">
+      <span class="f-emoji">🎁</span>
+      <h3>Unlock Rewards</h3>
+      <p>Save up for coffee dates, movie nights, and romantic dinners — then claim them together.</p>
     </div>
-    <div class="testimonial">
-      <p>"I love the clean interface and helpful insights about my rewards."</p>
-      <div class="author">— Emma K.</div>
+    <div class="card feature-card">
+      <span class="f-emoji">🎯</span>
+      <h3>Shared Goals</h3>
+      <p>Plan a weekend getaway or a dream date. Contribute points together and celebrate when you get there.</p>
     </div>
-    <div class="testimonial">
-      <p>"The platform is fast, reliable, and easy to use. Highly recommend!"</p>
-      <div class="author">— John P.</div>
+    <div class="card feature-card">
+      <span class="f-emoji">😊</span>
+      <h3>Mood Tracker</h3>
+      <p>Check in with each other's feelings and see your week bloom in a pretty little chart.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- About Section -->
-  <section id="about">
-    <h2>About BondPoints</h2>
-    <p>BondPoints is your ultimate rewards management platform. We help you track, redeem, and maximize loyalty points across all programs in one place.</p>
-    <p>Our mission is to make rewards effortless and enjoyable. With real-time updates, personalized tips, and secure storage, you’ll never miss a point again.</p>
-    
-    <div class="features">
-      <div class="feature">
-        <h3>Track Rewards</h3>
-        <p>See all your points and rewards in one convenient dashboard.</p>
-      </div>
-      <div class="feature">
-        <h3>Redeem Easily</h3>
-        <p>Quickly redeem your points for the rewards you love.</p>
-      </div>
-      <div class="feature">
-        <h3>Stay Notified</h3>
-        <p>Get reminders for expiring points and special offers.</p>
-      </div>
+<!-- Testimonials -->
+<section class="section wrap" id="testimonials">
+  <h2 class="section-title">Love notes from our couples 💌</h2>
+  <p class="section-sub">Sweet words from people who made every point count.</p>
+  <div class="testi-grid">
+    <div class="card testi">
+      <div class="stars">★★★★★</div><div class="quote">“</div>
+      <p>BondPoints made tracking our little wins so simple. We never miss a chance to celebrate!</p>
+      <div class="who">— Sarah J. 💗</div>
     </div>
-
-    <div class="about-cta">
-      <p>Ready to take control of your loyalty rewards?</p>
-      <button onclick="showLogin()">Login Now</button>
+    <div class="card testi">
+      <div class="stars">★★★★★</div><div class="quote">“</div>
+      <p>All our date ideas in one place! The rewards list keeps our weekends exciting.</p>
+      <div class="who">— Michael R. 💕</div>
     </div>
-  </section>
+    <div class="card testi">
+      <div class="stars">★★★★★</div><div class="quote">“</div>
+      <p>I love the cute interface — and the mood tracker genuinely helped us talk more.</p>
+      <div class="who">— Emma K. 💖</div>
+    </div>
+  </div>
+</section>
 
+<!-- About -->
+<section class="section wrap" id="about">
+  <h2 class="section-title">About BondPoints 🌸</h2>
+  <p class="section-sub">BondPoints is your cozy corner for celebrating relationships. Track thoughtful gestures, grow your streak, and turn everyday kindness into unforgettable rewards — together.</p>
+  <div class="card center" style="max-width:640px;margin:0 auto">
+    <p style="font-size:1.6rem;margin-bottom:10px">🌷 💗 🌷</p>
+    <p style="color:var(--ink-soft);line-height:1.7">Our mission is simple: make love a little more playful. With gentle reminders, sweet achievements, and shared dreams, you'll never miss a moment again.</p>
+    <div class="mt-3"><a class="bp-btn" href="signup.html">Join the fun 💕</a></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section wrap">
+  <div class="cta-band">
+    <h2>Ready to make every moment count? 💗</h2>
+    <p>Create your bond in under a minute — it's free and adorable.</p>
+    <a class="bp-btn" href="signup.html">Get Started 💕</a>
+  </div>
+</section>
+
+<footer class="bp-footer">
+  <div class="hearts">💗 💕 💖 💕 💗</div>
+  <p class="mt-1">Made with love · BondPoints © 2026</p>
+</footer>
+
+<script src="js/common.js"></script>
 <script>
-  // Backend API base. Override with window.BONDPOINTS_API_BASE
-  // (e.g. "http://localhost:5000" for local dev). Defaults to the
-  // production Render backend so deploys keep working.
-  const API_BASE = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "");
-  // Show/hide login form
-  function showLogin() {
-    document.getElementById('login').style.display = 'block';
-    document.getElementById('login').scrollIntoView({behavior:'smooth'});
-  }
-  function hideLogin() {
-    document.getElementById('login').style.display = 'none';
+  bpHearts('heartsCanvas', 24);
+
+  const navAuth = document.getElementById('navAuth');
+  const loginSection = document.getElementById('loginSection');
+  const heroLoginBtn = document.getElementById('heroLoginBtn');
+
+  function openLogin() {
+    loginSection.classList.remove('hidden');
+    loginSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => document.getElementById('email').focus(), 500);
   }
 
-  // =========================================================================
-  // CORRECTED LOGIN HANDLER: USES REDIRECT URL SENT BY THE BACKEND
-  // The backend (auth.js) now sends 'redirectUrl' based on isConfigured status.
-  // =========================================================================
-  document.getElementById('loginForm').addEventListener('submit', async function(e){
+  if (bpGetToken()) {
+    navAuth.innerHTML = '<a href="dashboard.html" class="bp-btn bp-btn-sm">💗 My Dashboard</a>';
+    heroLoginBtn.textContent = '💗 Go to Dashboard';
+    heroLoginBtn.addEventListener('click', () => window.location.href = 'dashboard.html');
+  } else {
+    navAuth.innerHTML = '<button class="linklike" id="navLoginBtn">Login</button>';
+    document.getElementById('navLoginBtn').addEventListener('click', openLogin);
+    heroLoginBtn.addEventListener('click', openLogin);
+  }
+
+  if (new URLSearchParams(location.search).get('login') === '1') openLogin();
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = document.getElementById('loginSubmit');
     const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    
-    // Ensure the correct base URL is used (adjust if needed)
-    const API_URL = API_BASE + "/api/auth/login";
-
+    const password = document.getElementById('password').value;
+    btn.disabled = true; btn.textContent = 'Logging you in... 💭';
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+      const { ok, data } = await bpApi('/api/auth/login', {
+        method: 'POST', body: JSON.stringify({ email, password })
       });
-  
-      const data = await res.json();
-  
-      if (res.ok) {
-        // 1. Store the JWT token
-        localStorage.setItem("token", data.token);
-  
-        // 2. CRITICAL FIX: Use the redirect URL determined by the backend (auth.js)
-        // This URL will be "dashboard.html" OR "bond-setup.html"
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-        } else {
-          // Fallback, though 'auth.js' should always provide one
-          window.location.href = "dashboard.html"; 
-        }
+      if (ok && data.token) {
+        bpSetToken(data.token);
+        bpToast('Welcome back! 💗', 'success');
+        setTimeout(() => { window.location.href = data.redirectUrl || 'dashboard.html'; }, 600);
       } else {
-        // Login failed (Invalid credentials, etc.)
-        alert(data.message || "Login failed");
+        bpToast(data && data.message ? data.message : 'Login failed 🥺', 'error');
       }
-    } catch (error) {
-      console.error('Login Error:', error);
-      alert("A network error occurred. Please try again.");
+    } catch (err) {
+      bpToast('Could not reach the server. Try again in a moment.', 'error');
     }
+    btn.disabled = false; btn.textContent = '💗 Login';
   });
-  // =========================================================================
-
-  // Floating hearts (kept your animation code)
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.className = 'heart';
-    heart.style.left = Math.random() * window.innerWidth + 'px';
-    heart.style.animationDuration = (5 + Math.random() * 5) + 's';
-    document.getElementById('home').appendChild(heart);
-    setTimeout(() => heart.remove(), 10000);
-  }
-  setInterval(createHeart, 300);
-
-  // Magical bond nodes (kept your animation code)
-  const canvas = document.getElementById('bondCanvas');
-  const ctx = canvas.getContext('2d');
-  let nodes = [];
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  function createNodes(count = 50) {
-    nodes = [];
-    for (let i = 0; i < count; i++) {
-      nodes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: 2 + Math.random() * 3
-      });
-    }
-  }
-
-  function drawNodes() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw nodes
-    for (let node of nodes) {
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-      ctx.fillStyle = '#ff7eb9';
-      ctx.fill();
-    }
-
-    // Draw connecting lines
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const dx = nodes[i].x - nodes[j].x;
-        const dy = nodes[i].y - nodes[j].y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if(dist < 150) {
-          ctx.beginPath();
-          ctx.moveTo(nodes[i].x, nodes[i].y);
-          ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.strokeStyle = `rgba(255,126,185,${1 - dist/150})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-      }
-    }
-  }
-
-  function updateNodes() {
-    for (let node of nodes) {
-      node.x += node.vx;
-      node.y += node.vy;
-
-      // Bounce off walls
-      if(node.x < 0 || node.x > canvas.width) node.vx *= -1;
-      if(node.y < 0 || node.y > canvas.height) node.vy *= -1;
-
-      // Optional: interact with hearts
-      document.querySelectorAll('.heart').forEach(heart => {
-        const hx = parseFloat(heart.style.left || 0);
-        const hy = window.innerHeight - (parseFloat(heart.style.top) || 0);
-        const dx = node.x - hx;
-        const dy = node.y - hy;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if(dist < 50) {
-          node.vx += dx*0.001;
-          node.vy += dy*0.001;
-        }
-      });
-    }
-  }
-
-  function animate() {
-    updateNodes();
-    drawNodes();
-    requestAnimationFrame(animate);
-  }
-
-  createNodes(60);
-  animate();
 </script>
-
 </body>
 </html>

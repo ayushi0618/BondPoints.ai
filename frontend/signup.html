@@ -1,197 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
-    <style>
-        /* Background */
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #1c1c1c;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            color: #fff;
-        }
-
-        /* Heart animation behind */
-        .heart {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #ff4f87;
-            transform: rotate(-45deg);
-            animation: floatUp 5s linear infinite;
-            opacity: 0.7;
-        }
-        .heart:before,
-        .heart:after {
-            content: "";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: #ff4f87;
-            border-radius: 50%;
-        }
-        .heart:before { top: -10px; left: 0; }
-        .heart:after { left: 10px; top: 0; }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(-45deg); opacity: 0.7; }
-            100% { transform: translateY(-800px) rotate(-45deg); opacity: 0; }
-        }
-
-        /* Container */
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 450px;
-            padding: 30px;
-            background: #2b2b2b;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-            animation: fadeIn 0.8s ease-in-out;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #ff4f87;
-        }
-
-        form {
-            display: grid;
-            gap: 15px;
-        }
-
-        input {
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        input[type="text"], input[type="email"], input[type="password"] {
-            background: #1f1f1f;
-            color: #fff;
-        }
-
-        input:focus {
-            border: 2px solid #ff4f87;
-        }
-
-        button {
-            background: linear-gradient(135deg, #ff6b9e, #ff4f87);
-            color: #fff;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255,107,158,0.4);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .login-link a {
-            color: #ff4f87;
-            text-decoration: none;
-        }
-
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(20px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join BondPoints 💗 — Create your account</title>
+<link rel="stylesheet" href="css/cute.css">
+<style>
+  .auth-wrap { min-height: calc(100vh - 130px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 1; }
+  .auth-card { width: 100%; max-width: 440px; text-align: center; }
+  .auth-card h1 { color: var(--pink-dark); font-size: 1.8rem; margin-bottom: 6px; }
+  .auth-card .sub { color: var(--ink-soft); margin-bottom: 24px; font-size: .98rem; }
+  .auth-card form { text-align: left; }
+  .auth-emoji { font-size: 2.6rem; margin-bottom: 10px; animation: floaty 3s ease-in-out infinite; display: inline-block; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .login-switch { text-align: center; margin-top: 16px; color: var(--ink-soft); font-size: .95rem; }
+  .login-switch a { color: var(--pink-dark); font-weight: 700; }
+  .back-link { display: inline-block; margin-top: 18px; color: var(--ink-soft); font-weight: 600; font-size: .92rem; text-decoration: none; }
+  .back-link:hover { color: var(--pink-dark); }
+</style>
 </head>
 <body>
+<canvas id="heartsCanvas"></canvas>
 
-<div class="container">
-    <h1>Create Account</h1>
+<nav class="bp-nav">
+  <a class="bp-logo" href="index.html"><span class="logo-heart">💗</span> BondPoints</a>
+  <button class="nav-toggle" aria-label="Menu">☰</button>
+  <div class="bp-nav-links">
+    <a href="index.html">Home</a>
+    <a href="index.html?login=1">Login</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <span class="auth-emoji">💕</span>
+    <h1>Join BondPoints</h1>
+    <p class="sub">Start your love story in under a minute ✨</p>
     <form id="signupForm">
-        <input type="text" id="fullName" placeholder="Full Name" required>
-        <input type="email" id="email" placeholder="Email Address" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit" id="signupBtn">Sign Up</button>
+      <div class="field">
+        <label for="name">Your name</label>
+        <input type="text" id="name" placeholder="e.g. Aisha" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Min. 6 characters 💭" required minlength="6" autocomplete="new-password">
+      </div>
+      <button type="submit" class="bp-btn bp-btn-block" id="signupSubmit">💗 Create my account</button>
     </form>
-    <p class="login-link">Already have an account? <a href="index.html">Login</a></p>
+    <p class="login-switch">Already have an account? <a href="index.html?login=1">Login 💗</a></p>
+    <a class="back-link" href="index.html">← Back to home</a>
+  </div>
 </div>
+
+<footer class="bp-footer">
+  <div class="hearts">💗 💕 💖 💕 💗</div>
+  <p class="mt-1">Made with love · BondPoints © 2026</p>
+</footer>
+
+<script src="js/common.js"></script>
 <script>
-    // Backend API base. Override with window.BONDPOINTS_API_BASE
-    // (e.g. "http://localhost:5000" for local dev). Defaults to the
-    // production Render backend so deploys keep working.
-    const API_BASE = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "");
-    // Floating hearts
-    for(let i=0;i<30;i++){
-        let heart = document.createElement('div');
-        heart.className = 'heart';
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.animationDuration = (3 + Math.random() * 5) + 's';
-        heart.style.width = heart.style.height = (10 + Math.random()*20)+'px';
-        document.body.appendChild(heart);
-    }
+  bpHearts('heartsCanvas', 20);
 
-// =========================================================================
-// CORRECTED SIGNUP HANDLER: USES REDIRECT URL SENT BY THE BACKEND
-// =========================================================================
-document.getElementById('signupForm').addEventListener('submit', async function(e){
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById("fullName").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    
-    // Check local required fields
-    if(!name || !email || !password){
-        alert("Please fill in all fields!");
-        return;
-    }
-    
-    // Ensure the correct base URL is used (adjust if needed)
-    const API_URL = API_BASE + "/api/auth/signup";
-
+    const btn = document.getElementById('signupSubmit');
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (password.length < 6) { bpToast('Password needs at least 6 characters 🥺', 'error'); return; }
+    btn.disabled = true; btn.textContent = 'Creating your account... 💭';
     try {
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password })
-        });
-
-        const data = await res.json();
-
-        if(res.ok){
-            // 1. Save token in localStorage
-            localStorage.setItem("token", data.token);
-
-            // 2. CRITICAL FIX: Use the redirect URL determined by the backend (auth.js)
-            if (data.redirectUrl) {
-                window.location.href = data.redirectUrl;
-            } else {
-                // Fallback (for new users, this should be 'bond-setup.html')
-                window.location.href = "bond-setup.html"; 
-            }
-        } else {
-            // Signup failed (e.g., "User already exists")
-            alert(data.message || "Signup failed");
-        }
-    } catch(err){
-        console.error('Signup Error:', err);
-        alert("Could not reach backend. Is the server running?");
+      const { ok, data } = await bpApi('/api/auth/register', {
+        method: 'POST', body: JSON.stringify({ name, email, password })
+      });
+      if (ok && data.token) {
+        bpSetToken(data.token);
+        bpToast('Welcome to BondPoints! 💗', 'success');
+        setTimeout(() => { window.location.href = data.redirectUrl || 'bond-setup.html'; }, 600);
+      } else {
+        bpToast(data && data.message ? data.message : 'Signup failed 🥺', 'error');
+      }
+    } catch (err) {
+      bpToast('Could not reach the server. Try again in a moment.', 'error');
     }
-});
+    btn.disabled = false; btn.textContent = '💗 Create my account';
+  });
 </script>
-    
 </body>
 </html>

@@ -3,303 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create Bond</title>
+<title>Create your Bond 💞 — BondPoints</title>
+<link rel="stylesheet" href="css/cute.css">
 <style>
-    /* Dark dashboard background */
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background: #0f0f0f;
-        overflow-x: hidden;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    /* Heart animation */
-    .heart-bg {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: 0;
-    }
-    .heart {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: linear-gradient(45deg, #ff4f87, #ff6b9e);
-        transform: rotate(-45deg);
-        animation: floatHeart linear infinite;
-    }
-    .heart::before,
-    .heart::after {
-        content: "";
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        background: linear-gradient(45deg, #ff4f87, #ff6b9e);
-        border-radius: 50%;
-    }
-    .heart::before { top: -10px; left: 0; }
-    .heart::after { left: 10px; top: 0; }
-
-    @keyframes floatHeart {
-        0% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
-        50% { opacity: 1; }
-        100% { transform: translateY(-100px) rotate(-45deg); opacity: 0; }
-    }
-
-    /* Container */
-    .container {
-        width: 100%;
-        max-width: 900px;
-        padding: 20px;
-        margin-top: 2rem;
-        z-index: 1;
-        position: relative;
-    }
-
-    h1.page-title {
-        text-align: center;
-        margin-bottom: 2rem;
-        color: #ff4f87;
-        font-size: 2rem;
-    }
-
-    /* Box (cards) */
-    .box {
-        background: rgba(20, 20, 20, 0.85);
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.6);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .box:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 20px rgba(255,0,120,0.4);
-    }
-    .box h2 { margin-top:0; margin-bottom:1rem; color:#fff; }
-
-    /* Form layout */
-    form.form-grid {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 12px;
-        align-items: center;
-    }
-    form label { color:#ccc; font-size:0.9rem; }
-    form input, form select {
-        padding: 10px;
-        border: 1px solid #333;
-        border-radius: 10px;
-        background: #111;
-        color: #fff;
-        font-size: 0.95rem;
-        transition: border 0.3s;
-    }
-    form input:focus, form select:focus { border-color: #ff4f87; outline: none; }
-
-    /* Button */
-    .form-actions {
-        grid-column: span 2;
-        text-align: center;
-        margin-top: 1rem;
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #ff6b9e, #ff4f87);
-        color: #fff;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 12px;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255,107,158,0.4);
-    }
-    #bondSummary p, #bondSummary ul, #bondSummary li {
-        color: #ffb6c1; /* Light pink */
-    }
-
-    #bondInfo p, #bondInfo ul, #bondInfo li {
-        color: #ff69b4; /* Hot pink */
-    }
-
-
-    /* Back link */
-    .back-link { text-align: center; margin-top:1rem; }
-    .back-link a { color: #ff4f87; text-decoration:none; font-weight:bold; }
-    .back-link a:hover { text-decoration: underline; color:#d93c6b; }
+  .setup-wrap { min-height: calc(100vh - 130px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; z-index: 1; }
+  .setup-card { width: 100%; max-width: 520px; text-align: center; }
+  .setup-card h1 { color: var(--pink-dark); font-size: 1.8rem; margin-bottom: 6px; }
+  .setup-card .sub { color: var(--ink-soft); margin-bottom: 24px; font-size: .98rem; }
+  .setup-card form { text-align: left; }
+  .setup-emoji { font-size: 2.6rem; margin-bottom: 10px; display: inline-block; animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .rel-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .rel-pill { flex: 1 1 30%; min-width: 110px; }
+  .rel-pill input { display: none; }
+  .rel-pill span {
+    display: block; text-align: center; padding: 12px 8px; border-radius: 16px;
+    border: 2px solid var(--pink-pale); background: #fffdfd; cursor: pointer;
+    font-weight: 700; font-size: .92rem; transition: all .2s ease;
+  }
+  .rel-pill input:checked + span {
+    border-color: var(--pink); background: var(--pink-pale); color: var(--pink-dark);
+    box-shadow: 0 6px 16px rgba(255,107,158,.25); transform: translateY(-2px);
+  }
 </style>
 </head>
 <body>
-<div class="heart-bg" id="hearts"></div>
+<canvas id="heartsCanvas"></canvas>
 
-<div class="container">
-    <h1 class="page-title">Create Your Bond</h1>
+<nav class="bp-nav">
+  <a class="bp-logo" href="index.html"><span class="logo-heart">💗</span> BondPoints</a>
+  <button class="nav-toggle" aria-label="Menu">☰</button>
+  <div class="bp-nav-links">
+    <a href="index.html">Home</a>
+    <button class="linklike" id="logoutBtn">Logout</button>
+  </div>
+</nav>
 
-    <div class="box">
-        <h2>Bond Setup</h2>
-        <form id="bondSetupForm" class="form-grid">
-            <label for="userEmail">Your Email:</label>
-            <input type="email" id="userEmail" required>
-
-            <label for="partnerEmail">Partner's Email:</label>
-            <input type="email" id="partnerEmail" required>
-
-            <label for="bondName">Bond Name:</label>
-            <input type="text" id="bondName" required>
-
-            <label for="bondType">Bond Type:</label>
-            <select id="bondType" required>
-                <option value="friendship">Friendship</option>
-                <option value="relationship">Relationship</option>
-                <option value="marriage">Marriage</option>
-            </select>
-
-            <label for="bondDuration">Duration (days):</label>
-            <select id="bondDuration" required>
-                <option value="7">7</option>
-                <option value="30">30</option>
-                <option value="90">90</option>
-            </select>
-
-            <label for="bondStartDate">Start Date:</label>
-            <input type="date" id="bondStartDate" required>
-
-            <label for="bondEndDate">End Date:</label>
-            <input type="date" id="bondEndDate" required>
-
-            <div class="form-actions">
-                <button type="submit" id="startBondBtn" class="btn-primary">Start Bond</button>
-            </div>
-        </form>
-    </div>
-
-    <div id="bondSummary" class="box">
-        <h2>Bond Summary</h2>
-        <p>No bond started yet.</p>
-    </div>
-
-    <div id="bondInfo" class="box">
-        <h2>Bond Info</h2>
-        <p>Details will appear here after bond setup.</p>
-    </div>
-
-    <p class="back-link"><a href="index.html">← Back to home </a></p>
+<div class="setup-wrap">
+  <div class="card setup-card">
+    <span class="setup-emoji">💞</span>
+    <h1>Create your Bond</h1>
+    <p class="sub">Tell us about your special someone ✨</p>
+    <form id="bondForm">
+      <div class="field-row">
+        <div class="field">
+          <label for="yourName">Your name</label>
+          <input type="text" id="yourName" placeholder="You 💗" required>
+        </div>
+        <div class="field">
+          <label for="partnerName">Their name</label>
+          <input type="text" id="partnerName" placeholder="Them 💕" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>What are you two? 💭</label>
+        <div class="rel-pills">
+          <label class="rel-pill"><input type="radio" name="relationshipType" value="romantic" checked><span>💑 Romantic</span></label>
+          <label class="rel-pill"><input type="radio" name="relationshipType" value="friendship"><span>👯 Besties</span></label>
+          <label class="rel-pill"><input type="radio" name="relationshipType" value="family"><span>👨‍👩‍👧 Family</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="startDate">When did it start? 🌸</label>
+        <input type="date" id="startDate">
+      </div>
+      <button type="submit" class="bp-btn bp-btn-block" id="bondSubmit">💞 Create our bond</button>
+    </form>
+  </div>
 </div>
 
+<footer class="bp-footer">
+  <div class="hearts">💗 💕 💖 💕 💗</div>
+  <p class="mt-1">Made with love · BondPoints © 2026</p>
+</footer>
+
+<script src="js/common.js"></script>
 <script>
-    // Backend API base. Override with window.BONDPOINTS_API_BASE
-    // (e.g. "http://localhost:5000" for local dev). Defaults to the
-    // production Render backend so deploys keep working.
-    const API_BASE = (window.BONDPOINTS_API_BASE || "https://bondpoints-ai-1.onrender.com").replace(/\/$/, "");
-    // Heart animation
-    const heartsContainer = document.getElementById('hearts');
-    for(let i=0; i<30; i++){
-        const heart = document.createElement('div');
-        heart.className = 'heart';
-        heart.style.left = Math.random()*100 + 'vw';
-        heart.style.animationDuration = (5+Math.random()*5) + 's';
-        heart.style.width = heart.style.height = (10 + Math.random()*20) + 'px';
-        heartsContainer.appendChild(heart);
+  bpHearts('heartsCanvas', 20);
+  if (!bpRequireAuth()) { /* redirected to login */ }
+
+  document.getElementById('logoutBtn').addEventListener('click', bpLogout);
+
+  document.getElementById('bondForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('bondSubmit');
+    const yourName = document.getElementById('yourName').value.trim();
+    const partnerName = document.getElementById('partnerName').value.trim();
+    const relationshipType = document.querySelector('input[name="relationshipType"]:checked').value;
+    const startDate = document.getElementById('startDate').value || null;
+    btn.disabled = true; btn.textContent = 'Creating your bond... 💭';
+    try {
+      const { ok, data } = await bpApi('/api/bonds', {
+        method: 'POST', body: JSON.stringify({ yourName, partnerName, relationshipType, startDate })
+      });
+      if (ok) {
+        bpToast('Your bond is created! 💞', 'success');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
+      } else {
+        bpToast(data && data.message ? data.message : 'Could not create bond 🥺', 'error');
+      }
+    } catch (err) {
+      bpToast('Could not reach the server. Try again in a moment.', 'error');
     }
-
-    const token = localStorage.getItem("token");
-
-    // ==========================================================
-    // VALIDATION & BOND CREATION HANDLER
-    // Uses form submit event listener for better validation control
-    // ==========================================================
-    document.getElementById("bondSetupForm").addEventListener("submit", async function(e){
-        e.preventDefault(); // Stop default form submission
-
-        const bondName = document.getElementById("bondName").value.trim();
-        const email1 = document.getElementById("userEmail").value.trim();
-        const email2 = document.getElementById("partnerEmail").value.trim();
-        const bondType = document.getElementById("bondType").value;
-        const bondDuration = document.getElementById("bondDuration").value;
-        const bondStartDate = document.getElementById("bondStartDate").value;
-        const bondEndDate = document.getElementById("bondEndDate").value;
-        const currentToken = localStorage.getItem("token");
-
-        if (!currentToken) {
-            alert("You must be logged in to create a bond!");
-            // FIXED: Use relative path
-            window.location.href = "index.html"; 
-            return;
-        }
-
-        // Display summary locally before sending (optional but good UI)
-        document.getElementById("bondSummary").innerHTML = `
-            <h2>Bond Summary</h2>
-            <p><strong>${bondName}</strong> bond between <strong>${email1}</strong> and <strong>${email2}</strong>.</p>
-            <p>Type: ${bondType}</p>
-            <p>Duration: ${bondDuration} days</p>
-            <p>Start: ${bondStartDate}</p>
-            <p>End: ${bondEndDate}</p>
-        `;
-
-        try {
-            const res = await fetch(API_BASE + "/api/bonds", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-auth-token": currentToken
-                },
-                body: JSON.stringify({
-                    bondName,
-                    email1,
-                    email2,
-                    bondType,
-                    bondDuration,
-                    bondStartDate,
-                    bondEndDate
-                })
-            });
-
-            if (res.ok) {
-                // Successful Bond Creation: Redirect using the RELATIVE path
-                // This MUST match the path sent by auth.js for login success
-                window.location.href = "dashboard.html"; 
-            } else {
-                const err = await res.json();
-                alert(err.message || "Error creating bond. Check if partner email exists.");
-            }
-        } catch (error) {
-            console.error("Bond Creation Error:", error);
-            alert("A network error occurred. Check server status.");
-        }
-    });
-
-    // ==========================================================
-    // Fetch bonds on page load (Authentication check)
-    // ==========================================================
-    async function fetchBonds() {
-        const currentToken = localStorage.getItem("token");
-        if (!currentToken) {
-            console.log("Not logged in, redirecting to login.");
-            // FIXED: Use relative path
-            window.location.href = "index.html"; 
-            return;
-        }
-
-        const res = await fetch(API_BASE + "/api/bonds", {
-          headers: { "x-auth-token": currentToken }
-        });
-        if (!res.ok) {
-            alert("Session expired. Please log in again.");
-            window.location.href = "index.html";
-        }
-    }
-
-    fetchBonds();
+    btn.disabled = false; btn.textContent = '💞 Create our bond';
+  });
 </script>
-
 </body>
 </html>

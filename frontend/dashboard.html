@@ -1,879 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bond Dashboard — BondPoints</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Dashboard 💗 — BondPoints</title>
+<link rel="stylesheet" href="css/cute.css">
 <style>
-  :root{
-    --bg:#0f0f12; --card:rgba(255,255,255,0.04);
-    --accent1:#ff7eb9; --accent2:#ff4da6; --accent3:#89f7fe;
-    --glass: rgba(255,255,255,0.06);
-    --text:#eee;
+  /* theme backgrounds */
+  body[data-theme="default"] { background:
+    radial-gradient(1100px 500px at 10% -5%, #ffe3ee 0%, transparent 60%),
+    radial-gradient(900px 500px at 105% 15%, #e6dcff 0%, transparent 55%),
+    var(--cream); }
+  body[data-theme="peach"] { background:
+    radial-gradient(1100px 500px at 10% -5%, #ffe9d2 0%, transparent 60%),
+    radial-gradient(900px 500px at 105% 15%, #ffe3ee 0%, transparent 55%),
+    #fffaf5; }
+  body[data-theme="lavender"] { background:
+    radial-gradient(1100px 500px at 10% -5%, #e9e0ff 0%, transparent 60%),
+    radial-gradient(900px 500px at 105% 15%, #ffe3ee 0%, transparent 55%),
+    #faf8ff; }
+
+  .dash-hero {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--pink-dark) 100%);
+    border-radius: 32px; color: #fff; padding: 40px 30px; text-align: center;
+    box-shadow: var(--shadow-lg); position: relative; overflow: hidden; margin-top: 26px;
   }
-  /* theme: .theme-neon, .theme-minimal */
-  .theme-neon { --accent1:#7CFFB2; --accent2:#7AD1FF; --accent3:#FF7BE9; --bg:#07070a; }
-  .theme-minimal { --accent1:#6b7280; --accent2:#9ca3af; --accent3:#d1d5db; --bg:#fafafa; --text:#111; --card:rgba(0,0,0,0.04); --glass: rgba(0,0,0,0.03); }
-  *{box-sizing:border-box; font-family: Inter, Arial, sans-serif}
-  html,body{height:100%; margin:0; background:linear-gradient(180deg,var(--bg), #0b0b0d); color:var(--text); -webkit-font-smoothing:antialiased}
-  .navbar{
-    position:sticky; top:0; z-index:999;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px 18px; gap:12px;
-    background: linear-gradient(90deg,var(--accent1), var(--accent3));
-    box-shadow:0 6px 20px rgba(0,0,0,0.35);
+  .dash-hero::before {
+    content: '💗 💕 💖 💕 💗'; position: absolute; top: 12px; left: 0; right: 0;
+    opacity: .3; font-size: 1.1rem; letter-spacing: 12px;
   }
-  .logo{font-weight:800; font-size:18px; color:#fff}
-  .nav-actions{display:flex; gap:10px; align-items:center}
-  .nav-actions button{background:transparent;border:0;color:#fff;font-weight:600;cursor:pointer;padding:8px 12px;border-radius:8px}
-  .nav-actions button:hover{opacity:.95; transform:translateY(-1px)}
-  .main { max-width:1200px; margin:26px auto; padding:0 18px; position:relative; z-index:2;}
-  /* hero */
-  #hero{
-    position:relative; overflow:hidden; border-radius:14px; padding:36px;
-    display:flex; flex-wrap:wrap; gap:24px; align-items:center; justify-content:space-between;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  .dash-hero h1 { font-size: clamp(1.6rem, 4vw, 2.3rem); margin-bottom: 8px; }
+  .dash-hero .sub { opacity: .92; margin-bottom: 20px; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero-actions .bp-btn { background: #fff; color: var(--pink-dark); box-shadow: 0 8px 20px rgba(0,0,0,.18); }
+  .hero-actions .bp-btn-ghost { border-color: rgba(255,255,255,.7); color: #fff; background: rgba(255,255,255,.14); }
+  .hero-actions .bp-btn-ghost:hover { background: rgba(255,255,255,.28); border-color: #fff; }
+
+  .theme-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  .theme-btn {
+    border: 2px solid rgba(255,255,255,.5); background: rgba(255,255,255,.16); color: #fff;
+    border-radius: 999px; padding: 8px 18px; font-family: 'Quicksand'; font-weight: 700;
+    font-size: .88rem; cursor: pointer; transition: all .2s ease;
   }
-  #hero .left { min-width:240px; flex:1; display:flex; flex-direction:column; gap:12px; align-items:flex-start}
-  #hero h1{margin:0; color:var(--accent1); font-size:28px}
-  #hero p{margin:0; color:var(--text); opacity:.95}
-  .hero-cta{display:flex; gap:10px; flex-wrap:wrap}
-  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2)); padding:10px 16px; border-radius:10px; color:#fff; border:0; cursor:pointer; font-weight:700}
-  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
-  /* top-circles */
-  .circles { display:flex; gap:20px; align-items:center; }
-  .circle-card{width:150px; height:150px; border-radius:100%; display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border: 6px solid rgba(255,255,255,0.03)}
-  .circle-card .value{font-size:26px; font-weight:800; color:var(--accent1)}
-  .circle-card .label{position:absolute; bottom:-18px; font-size:13px; color:var(--text)}
-  /* heart gauge (svg inside) */
-  .gauge { width:120px; height:120px; display:block }
-  /* right side small panels */
-  .hero-right { display:flex; gap:12px; align-items:center; }
-  .small-card{background:var(--card); padding:12px; border-radius:10px; min-width:180px}
-  .small-card h3{margin:0; font-size:14px; color:var(--accent1)}
-  .small-card p{margin:6px 0 0; color:var(--text); font-size:13px}
-  /* layout */
-  .grid{display:grid; grid-template-columns:1fr 380px; gap:20px; margin-top:20px}
-  @media(max-width:980px){ .grid{grid-template-columns:1fr} .hero-right{display:none} .little-hide{display:none} }
-  /* cards */
-  .card{background:var(--card); padding:18px; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.45)}
-  .card h2{margin:0 0 12px; color:var(--accent1)}
-  /* rewards list */
-  .rewards-list{display:flex; flex-direction:column; gap:12px}
-  .reward-item{display:grid; grid-template-columns:1fr 160px 80px; gap:10px; align-items:center; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))}
-  .reward-title{font-weight:700}
-  .progress-bar{height:12px; width:100%; background:rgba(255,255,255,0.03); border-radius:8px; overflow:hidden}
-  .progress-fill{height:100%; background:linear-gradient(90deg,var(--accent1),var(--accent2)); width:0}
-  .claim-btn{padding:8px 10px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--text); cursor:pointer}
-  .reward-meta{font-size:13px; color:var(--text); opacity:.9}
-  /* transaction history as timeline */
-  .timeline{display:flex; flex-direction:column; gap:10px}
-  .timeline-entry{display:flex; gap:12px; align-items:flex-start; padding:10px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))}
-  .entry-icon{width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px}
-  .entry-text{font-size:14px}
-  /* AI box improved */
-  .ai-hint{font-size:13px; color:#cfcfcf; margin-bottom:10px}
-  .ai-form label{display:block; font-size:13px; margin-bottom:6px}
-  .ai-form textarea{min-height:78px; resize:vertical}
-  .ai-response{margin-top:10px; font-style:italic; color:#cfcfcf}
-  /* mood chart */
-  canvas.mood-chart{width:100%; height:140px; display:block}
-  /* badges */
-  .badges{display:flex; gap:10px; flex-wrap:wrap}
-  .badge{padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); font-weight:700; font-size:13px}
-  /* shared goals */
-  .goal{padding:10px; border-radius:10px; display:flex; gap:10px; align-items:center; justify-content:space-between}
-  .goal .goal-meta{flex:1}
-  .goal .goal-actions{display:flex; gap:8px}
-  /* confetti placeholder */
-  .confetti { position:fixed; inset:0; pointer-events:none; z-index:9999 }
-  /* theme chooser */
-  .theme-select{display:flex; gap:8px; align-items:center}
-  .theme-btn{padding:6px 8px;border-radius:8px; cursor:pointer; border:1px solid rgba(255,255,255,0.06); background:transparent; color:var(--text)}
-  /* footer small */
-  .small{font-size:12px; color:#bdbdbd}
+  .theme-btn:hover { background: rgba(255,255,255,.32); transform: translateY(-2px); }
+  .theme-btn.active { background: #fff; color: var(--pink-dark); border-color: #fff; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 22px; }
+  .stat-card { text-align: center; padding: 20px 12px; transition: transform .2s ease; }
+  .stat-card:hover { transform: translateY(-4px) rotate(-.5deg); }
+  .stat-card .s-emoji { font-size: 1.9rem; display: block; margin-bottom: 6px; }
+  .stat-card .s-num { font-family: 'Quicksand'; font-weight: 700; font-size: 1.7rem; color: var(--pink-dark); display: block; }
+  .stat-card .s-label { font-size: .88rem; color: var(--ink-soft); font-weight: 600; }
+
+  .dash-grid { display: grid; gap: 22px; margin-top: 22px; }
+
+  /* incident box */
+  .incident-box { background: var(--pink-pale); border: 2px dashed var(--pink-soft); border-radius: 18px; padding: 18px; }
+  .incident-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .ai-preview { margin-top: 14px; background: #fff; border-radius: 14px; padding: 14px 16px; border: 2px solid var(--pink-soft); font-size: .95rem; line-height: 1.6; }
+  .ai-preview strong { color: var(--pink-dark); }
+
+  /* rewards */
+  .rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 6px; }
+  .reward-item {
+    background: #fffdfd; border: 2px solid var(--pink-pale); border-radius: 20px; padding: 18px;
+    text-align: center; transition: transform .2s ease; display: flex; flex-direction: column; gap: 8px;
+  }
+  .reward-item:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  .reward-item .r-emoji { font-size: 2.2rem; }
+  .reward-item h4 { color: var(--pink-dark); font-size: 1.05rem; }
+  .reward-item .cost { font-weight: 800; color: var(--ink); font-size: .95rem; }
+  .reward-item .cost small { color: var(--ink-soft); font-weight: 600; }
+  .reward-item.claimed { opacity: .65; border-style: dashed; }
+  .reward-item.claimed .r-emoji { filter: grayscale(.4); }
+
+  .btn-small {
+    font-family: 'Quicksand'; font-weight: 700; border: 0; border-radius: 999px;
+    padding: 9px 20px; cursor: pointer; font-size: .88rem; transition: all .18s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-success { background: linear-gradient(135deg, #54c47e, #35995c); color: #fff; box-shadow: 0 6px 14px rgba(53,153,92,.3); }
+  .btn-success:hover:not(:disabled) { transform: translateY(-2px); }
+  .btn-success:disabled { background: #c9b8c0; box-shadow: none; cursor: not-allowed; }
+  .btn-danger { background: #fff; color: #d14a6e; border: 2px solid #f3b8c9; }
+  .btn-danger:hover { background: #ffe9f0; transform: translateY(-2px); }
+  .btn-soft { background: var(--pink-pale); color: var(--pink-dark); }
+  .btn-soft:hover { background: var(--pink-soft); transform: translateY(-2px); }
+
+  /* history / goals / moods lists */
+  .history-list, .goals-list, .mood-log { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .history-item, .goal-item, .mood-item {
+    background: #fffdfd; border: 2px solid var(--pink-pale); border-radius: 16px;
+    padding: 13px 16px; display: flex; align-items: center; gap: 12px; font-size: .95rem;
+  }
+  .history-item .h-emoji, .goal-item .g-emoji, .mood-item .m-emoji { font-size: 1.5rem; flex-shrink: 0; }
+  .history-item .h-text, .goal-item .g-text { flex: 1; line-height: 1.5; }
+  .history-item .h-pts { font-weight: 800; color: var(--pink-dark); white-space: nowrap; }
+  .history-item .h-date, .mood-item .m-date { font-size: .8rem; color: var(--ink-soft); white-space: nowrap; }
+  .goal-item { flex-wrap: wrap; }
+  .goal-progress { width: 100%; height: 12px; background: var(--pink-pale); border-radius: 999px; overflow: hidden; margin-top: 4px; }
+  .goal-progress .fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--pink-dark)); border-radius: 999px; transition: width .4s ease; }
+  .goal-item .g-pts { font-weight: 800; color: var(--pink-dark); font-size: .9rem; }
+  .goal-actions { display: flex; gap: 8px; }
+  .goal-item.completed { border-color: var(--mint); background: #f4fbf6; }
+  .empty-note { text-align: center; color: var(--ink-soft); padding: 18px; font-style: italic; }
+
+  .form-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  #moodChart { width: 100%; max-height: 300px; margin-top: 14px; }
+
+  .mood-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .mood-opt { flex: 1 1 60px; }
+  .mood-opt input { display: none; }
+  .mood-opt span {
+    display: block; text-align: center; font-size: 1.6rem; padding: 10px 4px; border-radius: 14px;
+    border: 2px solid var(--pink-pale); background: #fffdfd; cursor: pointer; transition: all .18s ease;
+  }
+  .mood-opt input:checked + span { border-color: var(--pink); background: var(--pink-pale); transform: scale(1.08); }
+
+  @media (max-width: 720px) {
+    .form-card-grid { grid-template-columns: 1fr; }
+    .dash-hero { padding: 32px 20px; border-radius: 24px; }
+    .history-item .h-date { display: none; }
+  }
 </style>
 </head>
-<body class="">
+<body data-theme="default">
+<canvas id="heartsCanvas"></canvas>
 
-<!-- Navbar -->
-<div class="navbar">
-  <div class="logo">BondPoints</div>
-  <div class="nav-actions">
-    <div class="theme-select little-hide">
-      <button class="theme-btn" data-theme="default">Romantic</button>
-      <button class="theme-btn" data-theme="neon">Neon</button>
-      <button class="theme-btn" data-theme="minimal">Minimal</button>
+<nav class="bp-nav">
+  <a class="bp-logo" href="dashboard.html"><span class="logo-heart">💗</span> BondPoints</a>
+  <button class="nav-toggle" aria-label="Menu">☰</button>
+  <div class="bp-nav-links">
+    <button class="linklike" data-scroll="#historySection">📜 History</button>
+    <button class="linklike" data-scroll="#goalsSection">🎯 Shared Goals</button>
+    <button class="linklike" data-scroll="#moodSection">😊 Mood Tracker</button>
+    <button class="linklike" id="logoutBtn">🚪 Logout</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <!-- Hero -->
+  <div class="dash-hero">
+    <h1 id="bondTitle">💗 Our Bond 💗</h1>
+    <p class="sub" id="bondSubtitle">Loading your love story...</p>
+    <div class="hero-actions">
+      <button class="bp-btn" id="heroAddReward">🎁 Add Reward</button>
+      <button class="bp-btn-ghost" data-scroll="#rewardsSection">✨ View Rewards</button>
     </div>
-    <button class="btn secondary" id="btn-history">History</button>
-    <button class="btn" id="btn-logout">Logout</button>
+    <div class="theme-row">
+      <span style="align-self:center;font-weight:700;font-size:.9rem;opacity:.9">🎨 Theme:</span>
+      <button class="theme-btn active" data-theme="default">🌸 Blossom</button>
+      <button class="theme-btn" data-theme="peach">🍑 Peach</button>
+      <button class="theme-btn" data-theme="lavender">💜 Lavender</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="card stat-card"><span class="s-emoji">💎</span><span class="s-num" id="totalPoints">0</span><span class="s-label">Total Points</span></div>
+    <div class="card stat-card"><span class="s-emoji">🔥</span><span class="s-num" id="streakCount">0</span><span class="s-label">Day Streak</span></div>
+    <div class="card stat-card"><span class="s-emoji">📅</span><span class="s-num" id="weekPoints">0</span><span class="s-label">Points This Week</span></div>
+    <div class="card stat-card"><span class="s-emoji">🎁</span><span class="s-num" id="rewardsClaimed">0</span><span class="s-label">Rewards Claimed</span></div>
+  </div>
+
+  <div class="dash-grid">
+    <!-- Log a moment -->
+    <div class="card" id="incidentSection">
+      <h2><span class="emoji">💫</span> Log a Sweet Moment</h2>
+      <div class="incident-box">
+        <div class="field" style="margin-bottom:0">
+          <label for="incidentInput">What thoughtful thing happened? 💭</label>
+          <textarea id="incidentInput" placeholder="e.g. Surprised them with breakfast in bed 🥞💗"></textarea>
+        </div>
+        <div class="incident-actions">
+          <button class="btn-small btn-soft" id="aiSuggestBtn">🤖 AI Suggest Points</button>
+          <button class="btn-small btn-success" id="previewBtn">👀 Preview Points</button>
+          <button class="btn-small btn-danger" id="clearIncidentBtn">🗑️ Clear</button>
+        </div>
+        <div id="aiPreview" class="ai-preview hidden"></div>
+      </div>
+    </div>
+
+    <!-- Rewards -->
+    <div class="card" id="rewardsSection">
+      <h2><span class="emoji">🎁</span> Rewards — treat yourselves!</h2>
+      <div class="rewards-grid" id="rewardsGrid"></div>
+      <h3 style="margin:22px 0 12px;color:var(--pink-dark)">➕ Create a custom reward</h3>
+      <form id="customRewardForm">
+        <div class="field-row">
+          <div class="field"><label for="rewardName">Reward name</label><input type="text" id="rewardName" placeholder="e.g. Stargazing picnic 🌌" required></div>
+          <div class="field"><label for="rewardCost">Cost (points)</label><input type="number" id="rewardCost" min="1" max="1000" value="50" required></div>
+        </div>
+        <button type="submit" class="bp-btn bp-btn-sm">💗 Add Custom Reward</button>
+      </form>
+      <div class="mt-2"><button class="btn-small btn-danger" id="resetDemoBtn">🔄 Reset Demo Data</button></div>
+    </div>
+
+    <!-- History -->
+    <div class="card" id="historySection">
+      <h2><span class="emoji">📜</span> Our History</h2>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div class="form-card-grid">
+      <!-- Goals -->
+      <div class="card" id="goalsSection">
+        <h2><span class="emoji">🎯</span> Shared Goals</h2>
+        <form id="goalForm">
+          <div class="field"><label for="goalName">Goal name</label><input type="text" id="goalName" placeholder="e.g. Weekend getaway 🏖️" required></div>
+          <div class="field"><label for="goalTarget">Target points</label><input type="number" id="goalTarget" min="1" value="200" required></div>
+          <button type="submit" class="bp-btn bp-btn-sm bp-btn-block">💗 Create Goal</button>
+        </form>
+        <div class="goals-list mt-2" id="goalsList"></div>
+      </div>
+
+      <!-- Moods -->
+      <div class="card" id="moodSection">
+        <h2><span class="emoji">😊</span> Mood Tracker</h2>
+        <form id="moodForm">
+          <div class="mood-picker" id="moodPicker">
+            <label class="mood-opt"><input type="radio" name="mood" value="ecstatic" required><span title="Ecstatic">🤩</span></label>
+            <label class="mood-opt"><input type="radio" name="mood" value="happy"><span title="Happy">😊</span></label>
+            <label class="mood-opt"><input type="radio" name="mood" value="okay"><span title="Okay">😐</span></label>
+            <label class="mood-opt"><input type="radio" name="mood" value="sad"><span title="Sad">😢</span></label>
+            <label class="mood-opt"><input type="radio" name="mood" value="stressed"><span title="Stressed">😰</span></label>
+          </div>
+          <button type="submit" class="bp-btn bp-btn-sm bp-btn-block">💗 Log Mood</button>
+        </form>
+        <canvas id="moodChart"></canvas>
+        <div class="mood-log mt-2" id="moodLog"></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Animated background canvas and hearts -->
-<canvas id="bgCanvas" style="position:fixed;inset:0;z-index:0;pointer-events:none"></canvas>
+<footer class="bp-footer">
+  <div class="hearts">💗 💕 💖 💕 💗</div>
+  <p class="mt-1">Made with love · BondPoints © 2026</p>
+</footer>
 
-<div class="main" role="main">
-
-  <!-- HERO -->
-  <section id="hero" aria-label="dashboard hero">
-    <div class="left">
-      <h1>Bond Dashboard</h1>
-      <p>Track points, settle incidents, unlock rewards & celebrate progress together. Use the AI box below to record events — it will suggest points to add or deduct, update both dashboards and log a transaction.</p>
-
-      <div class="hero-cta">
-        <button class="btn" id="btn-add-reward">Add Reward</button>
-        <button class="btn secondary" id="btn-goals">Shared Goals</button>
-        <button class="btn secondary" id="btn-moods">Mood Tracker</button>
-      </div>
-    </div>
-
-    <div class="circles">
-      <!-- user circle with heart gauge -->
-      <div class="circle-card card-center" id="userCard">
-        <svg class="gauge" viewBox="0 0 120 120">
-          <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="var(--accent1)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
-          <circle cx="60" cy="60" r="40" fill="transparent" stroke="rgba(255,255,255,0.03)" stroke-width="14"/>
-          <circle id="userArc" cx="60" cy="60" r="40" fill="transparent" stroke="url(#g1)" stroke-width="14" stroke-linecap="round"
-                 stroke-dasharray="0 251.2" transform="rotate(-90 60 60)"/>
-          <text x="60" y="66" text-anchor="middle" fill="var(--text)" font-size="18" font-weight="800" id="userPtsText">100</text>
-        </svg>
-        <div class="label">You</div>
-      </div>
-
-      <div class="circle-card card-center" id="partnerCard">
-        <svg class="gauge" viewBox="0 0 120 120">
-          <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="var(--accent3)"/><stop offset="1" stop-color="var(--accent2)"/></linearGradient></defs>
-          <circle cx="60" cy="60" r="40" fill="transparent" stroke="rgba(255,255,255,0.03)" stroke-width="14"/>
-          <circle id="partnerArc" cx="60" cy="60" r="40" fill="transparent" stroke="url(#g2)" stroke-width="14" stroke-linecap="round"
-                 stroke-dasharray="0 251.2" transform="rotate(-90 60 60)"/>
-          <text x="60" y="66" text-anchor="middle" fill="var(--text)" font-size="18" font-weight="800" id="partnerPtsText">100</text>
-        </svg>
-        <div class="label">Partner</div>
-      </div>
-    </div>
-
-    <div class="hero-right little-hide">
-      <div class="small-card small card">
-        <h3>Streak</h3>
-        <p id="streakText">0 days positive streak</p>
-      </div>
-      <div class="small-card small card" style="margin-left:6px">
-        <h3>Badges</h3>
-        <div class="badges" id="badgesArea">
-          <!-- badges appear here -->
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GRID: left main + right sidebar -->
-  <div class="grid">
-
-    <!-- LEFT: main column -->
-    <div>
-
-     <!-- AI Suggestion / Interaction Box -->
-<div class="card" id="aiBox" style="
-  margin-bottom:18px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06));
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 20px rgba(255,126,185,0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  ">
-  <h2 style="color: var(--accent1);">AI Interaction — Record incident or positive note</h2>
-  <p class="ai-hint" style="font-size:13px; color:#cfcfcf; margin-bottom:10px;">
-    Write what happened (brief). The AI will suggest how many points to add or deduct, explain why, and automatically update points & transaction history. Choose who was responsible and the impact type.
-  </p>
-  <form id="aiForm" class="ai-form">
-    <label for="incidentInput" style="display:block; font-size:14px; font-weight:600; margin-bottom:6px; color:var(--accent1);">What happened?</label>
-    <textarea id="incidentInput" placeholder="e.g., 'I surprised them with breakfast' or 'I forgot an important call and delayed them'" 
-      style="width:100%; min-height:100px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); transition:border 0.2s ease, box-shadow 0.2s ease;"></textarea>
-
-    <label for="positiveToggle" style="display:block; font-size:14px; font-weight:600; margin:8px 0 6px; color:var(--accent1);">Tone</label>
-    <select id="tone" style="width:100%; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); cursor:pointer; transition:border 0.2s ease, box-shadow 0.2s ease;">
-      <option value="auto">Auto-detect (recommended)</option>
-      <option value="positive">Positive / Good</option>
-      <option value="negative">Negative / Bad</option>
-    </select>
-
-    <label for="personSelect" style="display:block; font-size:14px; font-weight:600; margin:8px 0 6px; color:var(--accent1);">Who was responsible?</label>
-    <select id="personSelect" style="width:100%; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); cursor:pointer; transition:border 0.2s ease, box-shadow 0.2s ease;">
-      <option value="you">You</option>
-      <option value="partner">Partner</option>
-    </select>
-
-    <label for="impactSelect" style="display:block; font-size:14px; font-weight:600; margin:8px 0 6px; color:var(--accent1);">Type of Impact</label>
-    <select id="impactSelect" style="width:100%; padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:var(--text); cursor:pointer; transition:border 0.2s ease, box-shadow 0.2s ease;">
-      <option value="emotional">Emotional</option>
-      <option value="mental">Mental</option>
-      <option value="trust">Trust</option>
-      <option value="time">Time</option>
-    </select>
-
-    <div style="display:flex;gap:8px; margin-top:10px;">
-      <button type="button" class="btn" id="aiSuggestBtn" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">Suggest & Apply</button>
-      <button type="button" class="btn secondary" id="aiPreviewBtn" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">Preview Suggestion</button>
-      <button type="button" class="btn secondary" id="aiClearBtn" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">Clear</button>
-    </div>
-  </form>
-
-  <div class="ai-response" id="aiSuggestionArea" style="
-    margin-top:12px;
-    font-style:italic;
-    color:#fff;
-    padding:12px 14px;
-    border-radius:12px;
-    background: linear-gradient(135deg, rgba(255,126,185,0.1), rgba(137,247,254,0.1));
-    border:1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;">No suggestion yet.</div>
-</div>
-
-      <!-- Rewards -->
-      <div class="card" id="rewardsCard" style="margin-bottom:18px">
-        <h2>Rewards — compete & redeem</h2>
-        <div class="rewards-list" id="rewardsList">
-          <!-- items injected by JS -->
-        </div>
-        <div style="margin-top:12px; display:flex; gap:8px">
-          <button class="btn" id="addRewardBtnSmall">Add Custom Reward</button>
-          <button class="btn secondary" id="bulkReset">Reset Demo Data</button>
-        </div>
-      </div>
-
-      <!-- Shared Goals -->
-      <div class="card" id="goalsCard" style="margin-bottom:18px">
-        <h2>Shared Goals</h2>
-        <div id="goalsList"></div>
-        <div style="margin-top:10px">
-          <button class="btn" id="createGoalBtn">Create Goal</button>
-        </div>
-      </div>
-
-      <!-- Mood tracker -->
-      <div class="card" id="moodCard" style="margin-bottom:18px">
-        <h2>Mood Tracker — weekly</h2>
-        <p style="color:#cfcfcf; margin:0 0 8px">Log moods and see a weekly trend. Positive entries increase chances of streaks & small bonus points.</p>
-        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px">
-          <select id="moodPerson"><option value="you">You</option><option value="partner">Partner</option></select>
-          <select id="moodValue"><option value="5">😊 Very Good</option><option value="4">🙂 Good</option><option value="3">😐 Okay</option><option value="2">😟 Low</option><option value="1">😢 Bad</option></select>
-          <button class="btn secondary" id="logMoodBtn">Log Mood</button>
-        </div>
-        <canvas id="moodChart" class="mood-chart"></canvas>
-      </div>
-
-    </div>
-
-    <!-- RIGHT: sidebar -->
-    <!-- ...existing code... -->
-<aside>
-  <div class="card" style="margin-bottom:18px">
-    <h2>Transaction History</h2>
-    <div class="timeline" id="timelineArea">
-      <p class="small">No transactions yet.</p>
-    </div>
-  </div>
-
-  <!-- 🔥 Monthly Streak Section (place here) -->
-  <section class="streak-section">
-    <h3>Monthly Streak</h3>
-    <div id="streakGrid" class="streak-grid"></div>
-  </section>
-
-  <style>
-    .streak-section {
-      margin-top: 2rem;
-      text-align: center;
-    }
-    .streak-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr); /* 7 days per row */
-      gap: 6px;
-      justify-content: center;
-      margin: 1rem auto;
-      max-width: 200px;
-    }
-    .streak-day {
-      width: 24px;
-      height: 24px;
-      background-color: #eee;
-      border-radius: 6px;
-      transition: background-color 0.3s ease;
-    }
-    .streak-day.active {
-      background-color: pink;
-    }
-  </style>
-
-  <script>
-    // Generate 30 streak boxes (organized in weeks)
-    const streakGrid = document.getElementById("streakGrid");
-    const totalDays = 30;
-
-    function initStreakGrid() {
-      for (let i = 1; i <= totalDays; i++) {
-        const box = document.createElement("div");
-        box.classList.add("streak-day");
-        box.dataset.day = i;
-        streakGrid.appendChild(box);
-      }
-    }
-
-    // Save streak progress in localStorage
-    function markDayComplete(day) {
-      localStorage.setItem(`streak-day-${day}`, "true");
-      updateStreakUI();
-    }
-
-    function updateStreakUI() {
-      document.querySelectorAll(".streak-day").forEach((box) => {
-        if (localStorage.getItem(`streak-day-${box.dataset.day}`) === "true") {
-          box.classList.add("active");
-        }
-      });
-    }
-
-    // Example: Mark today complete automatically (replace with goal completion hook)
-    const today = new Date().getDate(); // gets today's date (1–31)
-    if (today <= totalDays) {
-      markDayComplete(today);
-    }
-
-    // Init grid and update UI
-    initStreakGrid();
-    updateStreakUI();
-  </script>
-  <!-- ...rest of sidebar... -->
-  <div class="card" style="margin-bottom:18px">
-    <h2>Achievements</h2>
-    <div id="achieveArea" class="badges"> </div>
-  </div>
-  <div class="card">
-    <h2>Tips</h2>
-    <p class="small">Use the AI box to add both positive and negative events. Positive events help your streak & unlock bonuses. Negative events deduct points; AI will offer reflection tips to recover.</p>
-  </div>
-</aside>
-<!-- ...existing code... -->
-  </div>
-
-  <!-- confetti container -->
-  <div id="confetti" class="confetti" aria-hidden="true"></div>
-
-  <footer style="text-align:center; margin-top:24px" class="small">BondPoints demo • All data local to browser</footer>
-</div>
-
+<script src="js/common.js"></script>
 <script>
-/* ---------------------
-  Utilities & storage
-   --------------------- */
-const storage = {
-  get(k, def){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : def } catch(e){return def} },
-  set(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-}
+/* Dashboard logic — all buttons wired, all cute 💗 */
+(function () {
+  'use strict';
+  if (!bpRequireAuth()) return;
+  bpHearts('heartsCanvas', 18);
 
-/* default state */
-const state = storage.get('bp_state', {
-  userPoints: 100,
-  partnerPoints: 100,
-  rewards: [
-    {id: 'r_coffee', name:'☕ Coffee Date', pts:200},
-    {id: 'r_movie', name:'🍿 Movie Night', pts:500},
-    {id: 'r_dinner', name:'🌹 Romantic Dinner', pts:1000}
-  ],
-  timeline: [],
-  badges: [],
-  streak:{count:0,lastPositive:null},
-  goals: [],
-  moods: { you:[], partner:[] } // array of {date, val}
-});
-
-/* save helper */
-function saveState(){ storage.set('bp_state', state) }
-
-/* small helpers */
-const qs = s => document.querySelector(s);
-const qsa = s => Array.from(document.querySelectorAll(s));
-function formatDate(d = new Date()){ return new Date(d).toLocaleString(); }
-function pushHistory(text, icon='🔔'){
-  state.timeline.unshift({ts:Date.now(), text, icon});
-  if(state.timeline.length>200) state.timeline.pop();
-  renderTimeline();
-  saveState();
-}
-
-/* ---------------------
-  Animated background (particles + hearts) 
-   --------------------- */
-const bgCanvas = qs('#bgCanvas');
-const bgCtx = bgCanvas.getContext('2d');
-let w=innerWidth, h=innerHeight;
-function resizeBg(){ w=bgCanvas.width=innerWidth; h=bgCanvas.height=innerHeight }
-addEventListener('resize', resizeBg); resizeBg();
-
-let particles=[];
-function createParticles(n=60){
-  particles = [];
-  for(let i=0;i<n;i++){
-    particles.push({
-      x: Math.random()*w, y: Math.random()*h,
-      vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4,
-      r: 1 + Math.random()*2
-    })
-  }
-}
-createParticles(70);
-
-function drawBg(){
-  bgCtx.clearRect(0,0,w,h);
-  // lines
-  for(let i=0;i<particles.length;i++){
-    const a=particles[i];
-    for(let j=i+1;j<particles.length;j++){
-      const b=particles[j];
-      const dx=a.x-b.x, dy=a.y-b.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<160){
-        bgCtx.strokeStyle = 'rgba(255,126,185,'+ (1-dist/160)*0.07 +')';
-        bgCtx.beginPath(); bgCtx.moveTo(a.x,a.y); bgCtx.lineTo(b.x,b.y); bgCtx.stroke();
-      }
-    }
-  }
-  // dots
-  for(const p of particles){
-    bgCtx.beginPath(); bgCtx.fillStyle='rgba(255,126,185,0.9)'; bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill();
-    p.x += p.vx; p.y += p.vy;
-    if(p.x<0||p.x>w) p.vx*=-1;
-    if(p.y<0||p.y>h) p.vy*=-1;
-  }
-  requestAnimationFrame(drawBg);
-}
-drawBg();
-
-/* hearts floating */
-function spawnHeart(){
-  const el = document.createElement('div');
-  el.className = 'heart';
-  el.style.left = (Math.random()*100)+'vw';
-  el.style.top = '100%';
-  el.style.opacity = Math.random()*0.9+.1;
-  el.style.transform = 'rotate(-45deg)';
-  el.style.zIndex = 1;
-  document.body.appendChild(el);
-  el.animate([{transform:'translateY(0) rotate(-45deg)', opacity:1},{transform:'translateY(-100vh) rotate(-45deg)', opacity:0}], {duration:6000+Math.random()*4000, easing:'linear'});
-  setTimeout(()=> el.remove(), 11000);
-}
-setInterval(spawnHeart, 400);
-
-/* ---------------------
-  Rendering & UI
-   --------------------- */
-const userArc = qs('#userArc'), partnerArc = qs('#partnerArc');
-const userPtsText = qs('#userPtsText'), partnerPtsText = qs('#partnerPtsText');
-const rewardsListEl = qs('#rewardsList'), timelineEl = qs('#timelineArea'), badgesArea = qs('#badgesArea'), achieveArea = qs('#achieveArea'), streakText = qs('#streakText');
-const moodChart = qs('#moodChart').getContext('2d');
-
-function percentToDash(p){
-  // circumference = 2πr, r=40 => ~251.2
-  const c = 2*Math.PI*40;
-  return `${(p/100)*c} ${c}`;
-}
-function renderPoints(){
-  userPtsText.textContent = state.userPoints;
-  partnerPtsText.textContent = state.partnerPoints;
-  userArc.setAttribute('stroke-dasharray', percentToDash(Math.min(100, (state.userPoints/Math.max(1,getMaxGoalPoints()))*100)));
-  partnerArc.setAttribute('stroke-dasharray', percentToDash(Math.min(100, (state.partnerPoints/Math.max(1,getMaxGoalPoints()))*100)));
-}
-
-/* determine a good scale for the arcs using either max reward or explicit target */
-function getMaxGoalPoints(){
-  let maxPts = 1000;
-  state.rewards.forEach(r=>{ if(r.pts>maxPts) maxPts=r.pts });
-  state.goals.forEach(g=>{ if(g.target>maxPts) maxPts=g.target });
-  return maxPts;
-}
-
-/* render rewards */
-function renderRewards(){
-  rewardsListEl.innerHTML='';
-  state.rewards.forEach((r, idx)=>{
-    const div = document.createElement('div');
-    div.className='reward-item';
-    div.dataset.id = r.id || 'custom_'+idx;
-    div.innerHTML = `<div>
-        <div class="reward-title">${r.name}</div>
-        <div class="reward-meta">${r.pts} pts • Progress (your/partner)</div>
-      </div>
-      <div>
-        <div class="progress-bar"><div class="progress-fill" id="fill_${div.dataset.id}"></div></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px; align-items:flex-end">
-        <button class="claim-btn" data-id="${div.dataset.id}">Claim</button>
-        <div style="font-size:12px; color:var(--text); opacity:.8">${r.pts} pts</div>
-      </div>`;
-    rewardsListEl.appendChild(div);
-
-    // fill update
-    const fill = qs('#fill_'+div.dataset.id);
-    function updateFill(){
-      const userFillPct = Math.min(100, Math.round(state.userPoints / r.pts * 100));
-      const partnerFillPct = Math.min(100, Math.round(state.partnerPoints / r.pts * 100));
-      // show combined highest for visual
-      fill.style.width = Math.max(userFillPct, partnerFillPct)+'%';
-    }
-    updateFill();
-
-    // claim button
-    div.querySelector('.claim-btn').addEventListener('click', ()=>{
-      // whoever has enough claims first, priority to user
-      if(state.userPoints >= r.pts){
-        state.userPoints -= r.pts;
-        pushHistory(`You claimed "${r.name}" (-${r.pts})`, '🎉');
-        maybeAwardBadge('Rewarder');
-      } else if(state.partnerPoints >= r.pts){
-        state.partnerPoints -= r.pts;
-        pushHistory(`Partner claimed "${r.name}" (-${r.pts})`, '🎉');
-      } else {
-        alert('Not enough points yet!');
-        return;
-      }
-      saveState(); renderAll();
+  /* ---------- nav wiring ---------- */
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    bpToast('Logged out. See you soon! 💕');
+    setTimeout(bpLogout, 500);
+  });
+  document.querySelectorAll('[data-scroll]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const el = document.querySelector(btn.getAttribute('data-scroll'));
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
-}
-
-/* render timeline */
-function renderTimeline(){
-  if(!state.timeline.length){ timelineEl.innerHTML = '<p class="small">No transactions yet.</p>'; return; }
-  timelineEl.innerHTML='';
-  state.timeline.forEach(item=>{
-    const e = document.createElement('div'); e.className='timeline-entry';
-    e.innerHTML = `<div class="entry-icon" style="background:linear-gradient(90deg,var(--accent1),var(--accent2))">${item.icon}</div>
-      <div class="entry-text"><strong>${item.text}</strong><div style="font-size:12px;color:#bfbfbf">${new Date(item.ts).toLocaleString()}</div></div>`;
-    timelineEl.appendChild(e);
-  })
-}
-
-/* badges */
-function maybeAwardBadge(key){
-  // simple badges: Rewarder (claimed a reward), StreakMaster (streak >=3), GoalSetter (create goal), Empath (positive adds >= 3)
-  if(key==='Rewarder' && !state.badges.includes('Rewarder')) state.badges.push('Rewarder');
-  if(key==='StreakMaster' && !state.badges.includes('StreakMaster')) state.badges.push('StreakMaster');
-  if(key==='GoalSetter' && !state.badges.includes('GoalSetter')) state.badges.push('GoalSetter');
-  if(key==='Empath' && !state.badges.includes('Empath')) state.badges.push('Empath');
-  renderBadges();
-  saveState();
-  confettiBurst();
-}
-function renderBadges(){
-  badgesArea.innerHTML=''; achieveArea.innerHTML='';
-  state.badges.forEach(b=>{
-    const el = document.createElement('div'); el.className='badge'; el.textContent = b;
-    badgesArea.appendChild(el);
-    const el2 = document.createElement('div'); el2.className='badge'; el2.textContent = b;
-    achieveArea.appendChild(el2);
+  document.getElementById('heroAddReward').addEventListener('click', () => {
+    document.getElementById('rewardsSection').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => document.getElementById('rewardName').focus(), 600);
   });
-}
 
-/* confetti */
-function confettiBurst(){
-  const root = qs('#confetti');
-  // simple confetti squares
-  for(let i=0;i<30;i++){
-    const s = document.createElement('div');
-    s.style.position='absolute';
-    s.style.left = Math.random()*100+'%';
-    s.style.top = Math.random()*30+'%';
-    s.style.width = s.style.height = (6+Math.random()*10)+'px';
-    s.style.background = ['#FF7EB9','#89F7FE','#FFD76B','#7CFFB2'][Math.floor(Math.random()*4)];
-    s.style.opacity = 0.95;
-    s.style.transform = `rotate(${Math.random()*360}deg)`;
-    s.style.borderRadius = (Math.random()>0.5? '2px':'50%');
-    root.appendChild(s);
-    const dur = 1500 + Math.random()*1200;
-    s.animate([{transform:`translateY(0)`, opacity:1},{transform:`translateY(${200+Math.random()*300}px) rotate(${Math.random()*720}deg)`, opacity:0}], {duration:dur, easing:'cubic-bezier(.2,.8,.2,1)'});
-    setTimeout(()=> s.remove(), dur+30);
-  }
-}
-
-/* render goals */
-function renderGoals(){
-  const wrap = qs('#goalsList'); wrap.innerHTML='';
-  if(!state.goals.length) wrap.innerHTML = '<p class="small">No shared goals yet.</p>';
-  state.goals.forEach((g,idx)=>{
-    const div = document.createElement('div'); div.className='goal';
-    const total = (g.contributeYou||0) + (g.contributePartner||0);
-    const pct = Math.min(100, Math.round(total / g.target * 100));
-    div.innerHTML = `<div class="goal-meta"><div style="font-weight:700">${g.name}</div><div class="small">${total}/${g.target} pts • ${pct}%</div>
-      <div style="width:100%; margin-top:6px; height:10px; background:rgba(255,255,255,0.03); border-radius:8px"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--accent1),var(--accent2));border-radius:8px"></div></div></div>
-      <div class="goal-actions">
-        <button class="btn" data-goal="${idx}" data-act="you">+You</button>
-        <button class="btn secondary" data-goal="${idx}" data-act="partner">+Partner</button>
-      </div>`;
-    wrap.appendChild(div);
-
-    div.querySelectorAll('button').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        const idx = +b.dataset.goal;
-        const who = b.dataset.act;
-        const amount = parseInt(prompt('Points to contribute:', '20'),10) || 0;
-        if(amount<=0) return;
-        if(who==='you' && state.userPoints < amount){ alert('Not enough points'); return; }
-        if(who==='partner' && state.partnerPoints < amount){ alert('Partner not enough points'); return; }
-        if(who==='you') { state.userPoints -= amount; state.goals[idx].contributeYou = (state.goals[idx].contributeYou||0) + amount; pushHistory(`You contributed ${amount} pts to goal "${state.goals[idx].name}"`, '🎯') }
-        else { state.partnerPoints -= amount; state.goals[idx].contributePartner = (state.goals[idx].contributePartner||0) + amount; pushHistory(`Partner contributed ${amount} pts to goal "${state.goals[idx].name}"`, '🎯') }
-        // check if goal reached
-        const g = state.goals[idx];
-        if((g.contributeYou||0) + (g.contributePartner||0) >= g.target){
-          pushHistory(`Goal "${g.name}" achieved!`, '🏆');
-          maybeAwardBadge('GoalSetter');
-        }
-        saveState(); renderAll();
-      });
-    })
+  /* ---------- theme switcher ---------- */
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.body.setAttribute('data-theme', btn.getAttribute('data-theme'));
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      localStorage.setItem('bp_theme', btn.getAttribute('data-theme'));
+      bpToast('Theme updated! 🎨');
+    });
   });
-}
-
-/* render mood chart */
-function renderMoodChart(){
-  // simple weekly chart: last 7 days counts averaged per person
-  const days=7;
-  const now = new Date(); const labels=[];
-  for(let i=days-1;i>=0;i--){
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate()-i);
-    labels.push(d);
-  }
-  // aggregate avg per day per person
-  const getAvg = (arr, date) => {
-    const day = date.toDateString();
-    const list = arr.filter(x => new Date(x.ts).toDateString() === day);
-    if(!list.length) return null;
-    return Math.round(list.reduce((s,i)=>s+i.val,0)/list.length);
-  }
-  const yYou = labels.map(d => getAvg(state.moods.you, d) || 0);
-  const yPartner = labels.map(d => getAvg(state.moods.partner, d) || 0);
-  // draw simple bar chart
-  const c = qs('#moodChart'); const ctx = c.getContext('2d');
-  c.width = c.clientWidth; c.height = 160;
-  ctx.clearRect(0,0,c.width,c.height);
-  const pad=18; const wbar = (c.width - pad*2) / (labels.length*2.5);
-  labels.forEach((d,i)=>{
-    const x = pad + i* (wbar*2.2);
-    const yh = c.height - 30;
-    // you
-    const v1 = yYou[i]; const ph1 = v1/5*(yh-20);
-    ctx.fillStyle = 'rgba(255,126,185,0.9)'; ctx.fillRect(x, c.height-20-ph1, wbar, ph1);
-    // partner
-    const v2 = yPartner[i]; const ph2 = v2/5*(yh-20);
-    ctx.fillStyle = 'rgba(137,247,254,0.9)'; ctx.fillRect(x + wbar + 6, c.height-20-ph2, wbar, ph2);
-    // labels
-    ctx.fillStyle = '#cfcfcf'; ctx.font = '11px sans-serif';
-    ctx.fillText((d.getMonth()+1)+'/'+d.getDate(), x, c.height - 4);
-  });
-}
-
-/* render streak & badges */
-function renderStreak(){
-  streakText.textContent = `${state.streak.count} day(s) positive streak`;
-  if(state.streak.count>=3) maybeAwardBadge('StreakMaster');
-}
-
-/* full render */
-function renderAll(){
-  renderPoints();
-  renderRewards();
-  renderTimeline();
-  renderBadges();
-  renderGoals();
-  renderMoodChart();
-  renderStreak();
-}
-
-/* ---------------------
-  AI Suggestion Logic (smarter)
-   - can auto-detect positive words
-   - damage types influence deduction ranges
-   - positive events add points
-   - logs timeline & reflection tips
-   --------------------- */
-const positiveWords = ["helped","gift","support","surprise","good","positive","love","kind","care","thank","nice","thoughtful","assist"];
-function aiSuggest({text,tone='auto', target='you', impact='emotional'}){
-  const lower = text.toLowerCase();
-  let action = 'deduct';
-  // detect positivity or force
-  if(tone==='positive') action='add';
-  else if(tone==='negative') action='deduct';
-  else {
-    if(positiveWords.some(w => lower.includes(w))) action='add';
-    else action='deduct';
+  const savedTheme = localStorage.getItem('bp_theme');
+  if (savedTheme) {
+    document.body.setAttribute('data-theme', savedTheme);
+    document.querySelectorAll('.theme-btn').forEach(b =>
+      b.classList.toggle('active', b.getAttribute('data-theme') === savedTheme));
   }
 
-  let change = 0;
-  if(action==='add'){
-    change = Math.floor(Math.random()*21)+10; // +10..30
-  } else {
-    switch(impact){
-      case 'emotional': change = Math.floor(Math.random()*11)+10; break; //10-20
-      case 'mental': change = Math.floor(Math.random()*11)+15; break; //15-25
-      case 'trust': change = Math.floor(Math.random()*16)+20; break; //20-35
-      case 'time': change = Math.floor(Math.random()*11)+5; break; //5-15
-      default: change = Math.floor(Math.random()*11)+8;
+  /* ---------- state ---------- */
+  const DEFAULT_REWARDS = [
+    { id: 1, name: 'Coffee Date', cost: 50, emoji: '☕', claimed: false },
+    { id: 2, name: 'Movie Night', cost: 100, emoji: '🎬', claimed: false },
+    { id: 3, name: 'Romantic Dinner', cost: 200, emoji: '🍽️', claimed: false },
+    { id: 4, name: 'Weekend Getaway', cost: 500, emoji: '🏖️', claimed: false }
+  ];
+  let state = { points: 0, streak: 0, weekPoints: 0, rewardsClaimed: 0, lastVisit: null };
+
+  function loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem('bondPoints_state') || 'null');
+      if (s) state = Object.assign(state, s);
+      if (!localStorage.getItem('bondPoints_rewards'))
+        localStorage.setItem('bondPoints_rewards', JSON.stringify(DEFAULT_REWARDS));
+      if (!localStorage.getItem('bondPoints_goals'))
+        localStorage.setItem('bondPoints_goals', JSON.stringify([]));
+      if (!localStorage.getItem('bondPoints_moods'))
+        localStorage.setItem('bondPoints_moods', JSON.stringify([]));
+      if (!localStorage.getItem('bondPoints_history'))
+        localStorage.setItem('bondPoints_history', JSON.stringify([]));
+    } catch (e) { /* corrupted storage -> start fresh */ }
+  }
+  function saveState() { localStorage.setItem('bondPoints_state', JSON.stringify(state)); }
+  function getRewards() { try { return JSON.parse(localStorage.getItem('bondPoints_rewards')) || []; } catch (e) { return []; } }
+  function setRewards(r) { localStorage.setItem('bondPoints_rewards', JSON.stringify(r)); }
+
+  function updateStreak() {
+    const today = new Date().toDateString();
+    if (state.lastVisit !== today) {
+      const yesterday = new Date(Date.now() - 864e5).toDateString();
+      state.streak = (state.lastVisit === yesterday) ? state.streak + 1 : 1;
+      state.lastVisit = today;
+      state.weekPoints = 0;
+      saveState();
     }
   }
 
-  // create a reason text and reflection tip
-  const reason = action==='add' ? `Positive: +${change} pts for "${text}"` : `Negative: -${change} pts for "${text}" (${impact})`;
-  const reflection = action==='add'
-    ? `Nice! That was a thoughtful move. Consider celebrating with a small shared activity to boost bonding.`
-    : `AI tip: Acknowledge it, apologize, and plan a corrective gesture (small favor/date) to regain points.`;
-
-  // return suggestion
-  return {action, change, reason, reflection, who: target};
-}
-
-/* AI UI actions */
-qs('#aiSuggestBtn').addEventListener('click', ()=>{
-  const text = qs('#incidentInput').value.trim();
-  if(!text){ alert('Describe the incident.'); return; }
-  const tone = qs('#tone').value;
-  const person = qs('#personSelect').value;
-  const impact = qs('#impactSelect').value;
-  const suggestion = aiSuggest({text, tone, target:person, impact});
-  applyAISuggestion(suggestion);
-});
-
-qs('#aiPreviewBtn').addEventListener('click', ()=>{
-  const text = qs('#incidentInput').value.trim() || '';
-  const tone = qs('#tone').value;
-  const person = qs('#personSelect').value;
-  const impact = qs('#impactSelect').value;
-  const suggestion = aiSuggest({text, tone, target:person, impact});
-  qs('#aiSuggestionArea').textContent = `Preview: ${suggestion.reason} — ${suggestion.reflection}`;
-});
-
-qs('#aiClearBtn').addEventListener('click', ()=>{ qs('#incidentInput').value=''; qs('#aiSuggestionArea').textContent='No suggestion yet.'});
-
-/* apply suggestion to state */
-function applyAISuggestion(sugg){
-  if(sugg.who === 'you'){
-    if(sugg.action==='deduct'){ state.userPoints = Math.max(0, state.userPoints - sugg.change); pushHistory(`You lost ${sugg.change} pts: ${sugg.reason}`, '➖'); }
-    else { state.userPoints += sugg.change; pushHistory(`You gained ${sugg.change} pts: ${sugg.reason}`, '➕'); }
-  } else {
-    if(sugg.action==='deduct'){ state.partnerPoints = Math.max(0, state.partnerPoints - sugg.change); pushHistory(`Partner lost ${sugg.change} pts: ${sugg.reason}`, '➖'); }
-    else { state.partnerPoints += sugg.change; pushHistory(`Partner gained ${sugg.change} pts: ${sugg.reason}`, '➕'); }
+  function renderStats() {
+    document.getElementById('totalPoints').textContent = state.points;
+    document.getElementById('streakCount').textContent = state.streak;
+    document.getElementById('weekPoints').textContent = state.weekPoints;
+    document.getElementById('rewardsClaimed').textContent = state.rewardsClaimed;
   }
-  // update streak logic: only positive increments streak for the person who gained points
-  if(sugg.action==='add'){
-    const now = new Date().toDateString();
-    if(sugg.who==='you'){
-      if(state.streak.lastPositive === now) { state.streak.count++ } else { state.streak.count = 1; state.streak.lastPositive = now }
+
+  function addPoints(points, description, emoji) {
+    state.points += points;
+    state.weekPoints += points;
+    saveState();
+    const history = JSON.parse(localStorage.getItem('bondPoints_history') || '[]');
+    history.unshift({ description, points, emoji: emoji || '💗', date: new Date().toLocaleString() });
+    localStorage.setItem('bondPoints_history', JSON.stringify(history.slice(0, 50)));
+    renderStats(); renderHistory();
+    bpToast('+' + points + ' points! ' + (emoji || '💗'), 'success');
+    launchConfetti();
+  }
+
+  /* ---------- bond info from API ---------- */
+  async function loadBond() {
+    try {
+      const { ok, data } = await bpApi('/api/bonds');
+      if (ok && data && data.length) {
+        const b = data[0];
+        document.getElementById('bondTitle').textContent =
+          '💗 ' + b.yourName + ' & ' + b.partnerName + ' 💗';
+        let sub = (b.relationshipType || 'bond') + ' · growing stronger every day 🌸';
+        if (b.startDate) sub = 'Together since ' + new Date(b.startDate).toLocaleDateString() + ' 🌸 ' + sub;
+        document.getElementById('bondSubtitle').textContent = sub;
+      } else {
+        document.getElementById('bondSubtitle').textContent = 'Your love story starts here 🌸';
+      }
+    } catch (e) {
+      document.getElementById('bondSubtitle').textContent = 'Your love story starts here 🌸';
+    }
+  }
+
+  /* ---------- incident: log a sweet moment ---------- */
+  function analyzeIncident(text) {
+    const lower = text.toLowerCase();
+    let points = 10;
+    const keywords = {
+      'surprise': 25, 'gift': 20, 'flowers': 15, 'dinner': 20, 'breakfast': 15,
+      'movie': 12, 'walk': 8, 'cook': 18, 'clean': 12, 'help': 15, 'listen': 10,
+      'hug': 8, 'kiss': 10, 'love': 12, 'romantic': 20, 'date': 18, 'trip': 25,
+      'massage': 22, 'dance': 14, 'song': 12, 'letter': 18, 'call': 8, 'remember': 15
+    };
+    for (const k in keywords) if (lower.includes(k)) points += keywords[k];
+    points += Math.min(20, Math.floor(text.length / 10));
+    points += Math.floor(Math.random() * 10);
+    return Math.min(100, Math.max(5, points));
+  }
+
+  function suggestPoints(text) {
+    if (!text.trim()) { bpToast('Tell us what happened first! 💭', 'error'); return null; }
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) hash = (hash * 31 + text.charCodeAt(i)) % 1000;
+    const base = 15 + (hash % 60);
+    const labels = [
+      { min: 70, label: 'Absolutely Legendary', emoji: '🏆' },
+      { min: 50, label: 'Super Sweet', emoji: '💖' },
+      { min: 30, label: 'Really Thoughtful', emoji: '💗' },
+      { min: 0, label: 'Lovely Gesture', emoji: '🌸' }
+    ];
+    const tier = labels.find(l => base >= l.min);
+    return { points: base, label: tier.label, emoji: tier.emoji,
+      message: tier.emoji + ' ' + tier.label + '! The AI thinks this moment deserves ~' + base + ' points.' };
+  }
+
+  document.getElementById('aiSuggestBtn').addEventListener('click', () => {
+    const text = document.getElementById('incidentInput').value;
+    const s = suggestPoints(text);
+    const box = document.getElementById('aiPreview');
+    if (!s) return;
+    box.classList.remove('hidden');
+    box.innerHTML = '<strong>🤖 AI Suggestion</strong><br>' + bpEscape(s.message) +
+      '<br><button class="btn-small btn-success" id="acceptSuggestion" style="margin-top:10px">💗 Add ' +
+      s.points + ' points</button>';
+    document.getElementById('acceptSuggestion').addEventListener('click', () => {
+      addPoints(s.points, text.slice(0, 80) || 'Sweet moment', s.emoji);
+      document.getElementById('incidentInput').value = '';
+      box.classList.add('hidden');
+    });
+  });
+
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    const text = document.getElementById('incidentInput').value;
+    if (!text.trim()) { bpToast('Write a moment first! 💭', 'error'); return; }
+    const pts = analyzeIncident(text);
+    addPoints(pts, text.slice(0, 80), '💫');
+    document.getElementById('incidentInput').value = '';
+    document.getElementById('aiPreview').classList.add('hidden');
+  });
+
+  document.getElementById('clearIncidentBtn').addEventListener('click', () => {
+    document.getElementById('incidentInput').value = '';
+    document.getElementById('aiPreview').classList.add('hidden');
+    bpToast('Cleared! Fresh canvas 🎨');
+  });
+
+  /* ---------- rewards ---------- */
+  const REWARD_EMOJIS = ['🎁', '💝', '🌟', '🍰', '🎈', '💐', '🍿', '🌙'];
+  function renderRewards() {
+    const grid = document.getElementById('rewardsGrid');
+    const rewards = getRewards();
+    grid.innerHTML = '';
+    rewards.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'reward-item' + (r.claimed ? ' claimed' : '');
+      const affordable = state.points >= r.cost && !r.claimed;
+      div.innerHTML =
+        '<span class="r-emoji">' + (r.emoji || '🎁') + '</span>' +
+        '<h4>' + bpEscape(r.name) + '</h4>' +
+        '<div class="cost">' + r.cost + ' <small>pts</small></div>' +
+        '<button class="btn-small ' + (r.claimed ? 'btn-soft' : 'btn-success') + '"' +
+        (affordable ? '' : ' disabled') + '>' +
+        (r.claimed ? '✅ Claimed' : affordable ? '💗 Claim' : '🔒 Need ' + (r.cost - state.points) + ' more') +
+        '</button>';
+      if (affordable) {
+        div.querySelector('button').addEventListener('click', () => claimReward(r.id));
+      }
+      grid.appendChild(div);
+    });
+  }
+
+  function claimReward(id) {
+    const rewards = getRewards();
+    const r = rewards.find(x => x.id === id);
+    if (!r || r.claimed || state.points < r.cost) return;
+    state.points -= r.cost;
+    state.rewardsClaimed += 1;
+    r.claimed = true;
+    setRewards(rewards); saveState();
+    renderRewards(); renderStats();
+    bpToast('Enjoy your "' + r.name + '"! ' + (r.emoji || '🎁'), 'success');
+    launchConfetti();
+  }
+
+  document.getElementById('customRewardForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('rewardName').value.trim();
+    const cost = parseInt(document.getElementById('rewardCost').value, 10);
+    if (!name || !(cost > 0)) { bpToast('Give your reward a name and a cost 💭', 'error'); return; }
+    const rewards = getRewards();
+    rewards.push({ id: Date.now(), name, cost,
+      emoji: REWARD_EMOJIS[rewards.length % REWARD_EMOJIS.length], claimed: false });
+    setRewards(rewards); renderRewards();
+    document.getElementById('rewardName').value = '';
+    bpToast('Reward added! 🎁', 'success');
+  });
+
+  document.getElementById('resetDemoBtn').addEventListener('click', () => {
+    if (!confirm('Reset all demo data (points, rewards, goals, moods)?')) return;
+    ['bondPoints_state', 'bondPoints_rewards', 'bondPoints_goals', 'bondPoints_moods', 'bondPoints_history']
+      .forEach(k => localStorage.removeItem(k));
+    loadState(); updateStreak(); renderAll();
+    bpToast('Fresh start! 🌸');
+  });
+
+  /* ---------- history ---------- */
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    let history = [];
+    try { history = JSON.parse(localStorage.getItem('bondPoints_history') || '[]'); } catch (e) {}
+    list.innerHTML = '';
+    if (!history.length) {
+      list.innerHTML = '<div class="empty-note">No moments logged yet — go make some magic! ✨</div>';
+      return;
+    }
+    history.slice(0, 12).forEach(h => {
+      const div = document.createElement('div');
+      div.className = 'history-item';
+      div.innerHTML =
+        '<span class="h-emoji">' + (h.emoji || '💗') + '</span>' +
+        '<span class="h-text">' + bpEscape(h.description || 'Sweet moment') + '</span>' +
+        '<span class="h-pts">+' + h.points + '</span>' +
+        '<span class="h-date">' + bpEscape(h.date || '') + '</span>';
+      list.appendChild(div);
+    });
+  }
+
+  /* ---------- shared goals ---------- */
+  function getGoals() { try { return JSON.parse(localStorage.getItem('bondPoints_goals')) || []; } catch (e) { return []; } }
+  function setGoals(g) { localStorage.setItem('bondPoints_goals', JSON.stringify(g)); }
+
+  document.getElementById('goalForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('goalName').value.trim();
+    const target = parseInt(document.getElementById('goalTarget').value, 10);
+    if (!name || !(target > 0)) { bpToast('Name your goal and set a target 💭', 'error'); return; }
+    const goals = getGoals();
+    goals.push({ id: Date.now(), name, target, you: 0, partner: 0, completed: false });
+    setGoals(goals); renderGoals();
+    document.getElementById('goalName').value = '';
+    bpToast('Goal created! Let\'s do this! 🎯', 'success');
+  });
+
+  function renderGoals() {
+    const list = document.getElementById('goalsList');
+    const goals = getGoals();
+    list.innerHTML = '';
+    if (!goals.length) {
+      list.innerHTML = '<div class="empty-note">No shared goals yet — dream something up together! 💭</div>';
+      return;
+    }
+    goals.forEach(g => {
+      const total = g.you + g.partner;
+      const pct = Math.min(100, Math.round((total / g.target) * 100));
+      const div = document.createElement('div');
+      div.className = 'goal-item' + (g.completed ? ' completed' : '');
+      div.innerHTML =
+        '<span class="g-emoji">' + (g.completed ? '🏆' : '🎯') + '</span>' +
+        '<span class="g-text"><strong>' + bpEscape(g.name) + '</strong><br>' +
+        '<span class="g-pts">' + total + ' / ' + g.target + ' pts · ' + pct + '%</span></span>' +
+        '<div class="goal-progress"><div class="fill" style="width:' + pct + '%"></div></div>' +
+        (g.completed
+          ? '<span style="font-weight:800;color:#2a9d5c">Completed! 🎉</span>'
+          : '<div class="goal-actions">' +
+            '<button class="btn-small btn-soft" data-who="you">💗 You +10</button>' +
+            '<button class="btn-small btn-soft" data-who="partner">💕 Partner +10</button>' +
+            '</div>');
+      if (!g.completed) {
+        div.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+          contributeGoal(g.id, b.getAttribute('data-who'));
+        }));
+      }
+      list.appendChild(div);
+    });
+  }
+
+  function contributeGoal(id, who) {
+    const goals = getGoals();
+    const g = goals.find(x => x.id === id);
+    if (!g || g.completed) return;
+    g[who] += 10;
+    if (g.you + g.partner >= g.target) {
+      g.completed = true;
+      bpToast('Goal "' + g.name + '" completed! You two are amazing! 🏆', 'success');
+      launchConfetti();
     } else {
-      if(state.streak.lastPositive === now) { state.streak.count++ } else { state.streak.count = 1; state.streak.lastPositive = now }
+      bpToast('+10 pts to "' + g.name + '"! 💗', 'success');
     }
-    // award small empath badge if many positives
-    const positiveCount = state.timeline.filter(t=>t.text.includes('gained')).length;
-    if(positiveCount>=3) maybeAwardBadge('Empath');
-    pushHistory(`AI reflection: ${sugg.reflection}`, '💬');
-  } else {
-    // negative: reduce streak
-    state.streak.count = 0;
+    setGoals(goals); renderGoals();
   }
 
-  qs('#aiSuggestionArea').textContent = S(`Applied: ${sugg.reason} — ${sugg.reflection}`);
-  saveState(); renderAll();
-}
+  /* ---------- moods ---------- */
+  const MOODS = { ecstatic: { emoji: '🤩', score: 5 }, happy: { emoji: '😊', score: 4 },
+    okay: { emoji: '😐', score: 3 }, sad: { emoji: '😢', score: 2 }, stressed: { emoji: '😰', score: 1 } };
 
-/* ---------------------
-  Mood logging
-   --------------------- */
-qs('#logMoodBtn').addEventListener('click', ()=>{
-  const who = qs('#moodPerson').value;
-  const val = parseInt(qs('#moodValue').value,10);
-  state.moods[who].push({ts:Date.now(), val});
-  pushHistory(`${who === 'you' ? 'You' : 'Partner'} logged mood ${['','😢','😟','😐','🙂','😊'][val]}`, '🙂');
-  saveState(); renderAll();
-});
+  document.getElementById('moodForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const picked = document.querySelector('input[name="mood"]:checked');
+    if (!picked) { bpToast('Pick a mood first! 😊', 'error'); return; }
+    let moods = [];
+    try { moods = JSON.parse(localStorage.getItem('bondPoints_moods') || '[]'); } catch (e) {}
+    moods.unshift({ mood: picked.value, date: new Date().toLocaleString() });
+    localStorage.setItem('bondPoints_moods', JSON.stringify(moods.slice(0, 30)));
+    picked.checked = false;
+    renderMoods(); drawMoodChart();
+    bpToast('Mood logged! ' + MOODS[picked.value].emoji, 'success');
+  });
 
-/* ---------------------
-  Goals / create
-   --------------------- */
-qs('#createGoalBtn').addEventListener('click', ()=>{
-  const name = prompt('Goal name:','Weekend getaway');
-  if(!name) return;
-  const target = parseInt(prompt('Target points?','2000'),10);
-  if(!target || target <= 0) return;
-  state.goals.push({name, target, contributeYou:0, contributePartner:0});
-  pushHistory(`Goal "${name}" created with target ${target}`, '🎯');
-  maybeAwardBadge('GoalSetter');
-  saveState(); renderAll();
-});
+  function renderMoods() {
+    const log = document.getElementById('moodLog');
+    let moods = [];
+    try { moods = JSON.parse(localStorage.getItem('bondPoints_moods') || '[]'); } catch (e) {}
+    log.innerHTML = '';
+    if (!moods.length) {
+      log.innerHTML = '<div class="empty-note">No moods logged yet — how are you feeling today? 💭</div>';
+      return;
+    }
+    moods.slice(0, 6).forEach(m => {
+      const info = MOODS[m.mood] || { emoji: '😊' };
+      const div = document.createElement('div');
+      div.className = 'mood-item';
+      div.innerHTML = '<span class="m-emoji">' + info.emoji + '</span>' +
+        '<span style="flex:1;text-transform:capitalize;font-weight:700">' + bpEscape(m.mood) + '</span>' +
+        '<span class="m-date">' + bpEscape(m.date || '') + '</span>';
+      log.appendChild(div);
+    });
+  }
 
-/* ---------------------
-  Add custom reward modal-ish
-   --------------------- */
-qs('#addRewardBtnSmall').addEventListener('click', addCustomRewardFlow);
-qs('#btn-add-reward').addEventListener('click', addCustomRewardFlow);
-function addCustomRewardFlow(){
-  const name = prompt('Reward name?','Custom Reward');
-  if(!name) return;
-  const pts = parseInt(prompt('Points required?','300'),10);
-  if(!pts || pts<=0) return;
-  const id = 'custom_'+Math.random().toString(36).slice(2,8);
-  state.rewards.push({id,name,pts});
-  pushHistory(`Custom reward "${name}" added (${pts} pts)`, '🏷️');
-  saveState(); renderAll();
-}
+  function drawMoodChart() {
+    const canvas = document.getElementById('moodChart');
+    const ctx = canvas.getContext('2d');
+    let moods = [];
+    try { moods = JSON.parse(localStorage.getItem('bondPoints_moods') || '[]'); } catch (e) {}
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.clientWidth || 300, H = 220;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, W, H);
+    const data = moods.slice(0, 10).reverse();
+    if (!data.length) {
+      ctx.fillStyle = '#8a6572'; ctx.font = '14px Nunito';
+      ctx.textAlign = 'center';
+      ctx.fillText('Log moods to see your chart bloom 🌸', W / 2, H / 2);
+      return;
+    }
+    const pad = 30, stepX = (W - pad * 2) / Math.max(1, data.length - 1);
+    const yFor = s => H - pad - ((s - 1) / 4) * (H - pad * 2);
+    // grid
+    ctx.strokeStyle = '#f3d3e0'; ctx.lineWidth = 1;
+    for (let s = 1; s <= 5; s++) {
+      ctx.beginPath(); ctx.moveTo(pad, yFor(s)); ctx.lineTo(W - pad, yFor(s)); ctx.stroke();
+    }
+    // line
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, '#ff8fb3'); grad.addColorStop(1, '#e84a7f');
+    ctx.strokeStyle = grad; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    data.forEach((m, i) => {
+      const x = pad + i * stepX, y = yFor((MOODS[m.mood] || {}).score || 3);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    ctx.stroke();
+    // dots + emoji
+    ctx.font = '18px serif'; ctx.textAlign = 'center';
+    data.forEach((m, i) => {
+      const x = pad + i * stepX, y = yFor((MOODS[m.mood] || {}).score || 3);
+      ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff'; ctx.fill();
+      ctx.strokeStyle = '#e84a7f'; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.fillText((MOODS[m.mood] || {}).emoji || '😊', x, y - 14);
+    });
+  }
+  window.addEventListener('resize', drawMoodChart);
 
-/* Reset demo data */
-qs('#bulkReset').addEventListener('click', ()=>{
-  if(!confirm('Reset all demo data to defaults?')) return;
-  localStorage.removeItem('bp_state'); location.reload();
-});
+  /* ---------- confetti ---------- */
+  function launchConfetti() {
+    const emojis = ['💗', '💕', '💖', '✨', '🎉', '🌸'];
+    for (let i = 0; i < 24; i++) {
+      const s = document.createElement('span');
+      s.textContent = emojis[(Math.random() * emojis.length) | 0];
+      s.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;font-size:' +
+        (14 + Math.random() * 18) + 'px;left:' + (Math.random() * 100) + 'vw;top:-30px;' +
+        'transition:transform ' + (1.6 + Math.random() * 1.4) + 's ease-in, opacity 2.6s;';
+      document.body.appendChild(s);
+      requestAnimationFrame(() => {
+        s.style.transform = 'translateY(110vh) rotate(' + (Math.random() * 720 - 360) + 'deg)';
+        s.style.opacity = '0';
+      });
+      setTimeout(() => s.remove(), 3200);
+    }
+  }
 
-/* ---------------------
-  Theme handling
-   --------------------- */
-qsa('.theme-btn').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    const t = b.dataset.theme;
-    document.body.classList.remove('theme-neon','theme-minimal');
-    if(t==='neon') document.body.classList.add('theme-neon');
-    if(t==='minimal') document.body.classList.add('theme-minimal');
-  })
-});
-
-/* ---------------------
-  small helper: template-safe text
-   --------------------- */
-function S(s){ return s.replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-
-/* ---------------------
-  Mood chart & initial render
-   --------------------- */
-renderAll();
-
-/* ---------------------
-  Timeline initial rendering & restore if any persisted
-   --------------------- */
-renderTimeline();
-
-/* helper: string truncation */
-function truncate(s,n=40){ return s.length>n? s.slice(0,n)+'...': s }
-
-/* convenience: render immediately state changes every second sync to localStorage */
-setInterval(()=> saveState(), 2000);
+  /* ---------- init ---------- */
+  function renderAll() {
+    renderStats(); renderRewards(); renderHistory(); renderGoals(); renderMoods(); drawMoodChart();
+  }
+  loadState();
+  updateStreak();
+  loadBond();
+  renderAll();
+})();
 </script>
-<button onclick="logout()">Logout</button>
-<script>
-function logout() {
-  localStorage.removeItem('currentUser');
-  window.location.href = "index.html";
-}
-</script>
-
-
-
 </body>
 </html>
